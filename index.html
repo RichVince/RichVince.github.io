@@ -354,6 +354,34 @@
       margin: 12px auto 18px;
       border-radius: 14px;
       border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .lab-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .coming-soon {
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+
+    .file-note {
+      margin-top: 10px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .file-note code {
+      color: #d8ebff;
+      font-size: 0.92rem;
     }
 
     .contact-grid {
@@ -607,7 +635,9 @@
               <strong>Skills:</strong> Wireless configuration, client connectivity, basic network setup, troubleshooting
             </p>
             <img class="lab-image" src="wireless-router-client-lab.png" alt="Wireless Router and Client Configuration Lab Screenshot">
-            <a class="btn btn-primary" href="wireless-router-client-lab.pkt" download>Download Lab File</a>
+            <div class="lab-actions">
+              <a class="btn btn-primary" href="wireless-router-client-lab.pkt" download>Download Lab File</a>
+            </div>
           </div>
 
           <div class="card lab-card">
@@ -620,18 +650,18 @@
             <p class="skills-line">
               <strong>Skills:</strong> IPv4 addressing, DHCP, static IP configuration, DNS, default gateway configuration, wireless connectivity, connectivity testing, router and switch cabling
             </p>
-            <p style="color: var(--muted); margin-bottom: 0;">
-              Add your screenshot and .pkt file for this lab once ready:
+            <div class="file-note">
+              Upload these files when ready, then replace this note with the image and download button:
+              <br><br>
+              <code>networking-basics-sba-lab.png</code>
               <br>
-              <code style="color:#cfe4ff;">networking-basics-sba-lab.png</code>
-              <br>
-              <code style="color:#cfe4ff;">networking-basics-sba-lab.pkt</code>
-            </p>
+              <code>networking-basics-sba-lab.pkt</code>
+            </div>
           </div>
 
           <div class="card lab-card">
             <h3>More Labs Coming Soon</h3>
-            <p>
+            <p class="coming-soon">
               Additional Packet Tracer, networking, and cybersecurity labs will be added here as I continue
               building my portfolio and documenting practical work.
             </p>
