@@ -1,714 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Richard Vincent | Cybersecurity Portfolio</title>
-  <style>
-    :root {
-      --bg: #07111f;
-      --bg-soft: #0d1b2e;
-      --card: #101f35;
-      --card-2: #142744;
-      --text: #e8f1ff;
-      --muted: #9eb6d8;
-      --accent: #3ea6ff;
-      --accent-2: #69c3ff;
-      --border: rgba(130, 180, 255, 0.16);
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-      --radius: 18px;
-      --max: 1120px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background:
-        radial-gradient(circle at top right, rgba(62,166,255,0.08), transparent 30%),
-        radial-gradient(circle at top left, rgba(105,195,255,0.07), transparent 25%),
-        linear-gradient(180deg, #06101c 0%, #091524 100%);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    a {
-      color: var(--accent-2);
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    .container {
-      width: min(100% - 32px, var(--max));
-      margin: 0 auto;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
-      background: rgba(7, 17, 31, 0.82);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 0;
-    }
-
-    .brand {
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: white;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-
-    .nav-links a {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .nav-links a:hover {
-      color: white;
-      text-decoration: none;
-    }
-
-    .hero {
-      padding: 72px 0 48px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 28px;
-      align-items: stretch;
-    }
-
-    .hero-panel,
-    .summary-panel {
-      background: linear-gradient(180deg, rgba(16,31,53,0.95), rgba(10,21,37,0.95));
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
-
-    .hero-panel {
-      padding: 34px 30px;
-    }
-
-    .eyebrow {
-      display: inline-block;
-      color: var(--accent-2);
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-
-    h1 {
-      margin: 0 0 14px;
-      font-size: clamp(2rem, 5vw, 3.4rem);
-      line-height: 1.1;
-    }
-
-    .hero-subtitle {
-      margin: 0 0 16px;
-      color: var(--accent-2);
-      font-size: 1.05rem;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-
-    .hero-text {
-      color: var(--muted);
-      max-width: 62ch;
-      margin-bottom: 22px;
-    }
-
-    .cta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 12px 18px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      text-decoration: none;
-      transition: 0.2s ease;
-      border: 1px solid transparent;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #2f8ae0);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      text-decoration: none;
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text);
-      border-color: var(--border);
-    }
-
-    .btn-secondary:hover {
-      text-decoration: none;
-      background: rgba(255,255,255,0.03);
-    }
-
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .tag {
-      background: rgba(62,166,255,0.1);
-      border: 1px solid rgba(62,166,255,0.18);
-      color: var(--accent-2);
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 0.9rem;
-    }
-
-    .summary-panel {
-      padding: 26px 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .summary-panel h2 {
-      margin-top: 0;
-      margin-bottom: 18px;
-      font-size: 1.2rem;
-      color: white;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .stat {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-    }
-
-    .stat-number {
-      font-size: 1.55rem;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 4px;
-    }
-
-    .stat-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .focus-list {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--muted);
-    }
-
-    .section {
-      padding: 52px 0;
-    }
-
-    .section-title {
-      font-size: 1.75rem;
-      margin: 0 0 10px;
-    }
-
-    .section-intro {
-      margin: 0 0 24px;
-      color: var(--muted);
-      max-width: 70ch;
-    }
-
-    .card {
-      background: linear-gradient(180deg, var(--card), var(--bg-soft));
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-
-    .about-card {
-      padding: 28px;
-    }
-
-    .about-card p {
-      margin-top: 0;
-      color: var(--muted);
-    }
-
-    .about-card p:last-child {
-      margin-bottom: 0;
-    }
-
-    .cert-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .cert-card {
-      padding: 18px;
-      background: linear-gradient(180deg, var(--card-2), var(--card));
-      border: 1px solid var(--border);
-      border-radius: 16px;
-    }
-
-    .cert-card h3 {
-      margin: 0 0 8px;
-      font-size: 1rem;
-      color: white;
-    }
-
-    .cert-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.94rem;
-    }
-
-    .pill {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      border: 1px solid var(--border);
-      color: var(--accent-2);
-      background: rgba(62,166,255,0.08);
-    }
-
-    .labs-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-    }
-
-    .lab-card {
-      padding: 22px;
-    }
-
-    .lab-card h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      color: white;
-      font-size: 1.2rem;
-    }
-
-    .lab-card p {
-      color: var(--muted);
-      margin-top: 0;
-    }
-
-    .skills-line {
-      color: #cfe4ff;
-      font-size: 0.95rem;
-      margin-bottom: 14px;
-    }
-
-    .lab-image {
-      width: 100%;
-      max-width: 760px;
-      display: block;
-      margin: 12px auto 18px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-    }
-
-    .lab-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 6px;
-    }
-
-    .coming-soon {
-      color: var(--muted);
-      margin-bottom: 0;
-    }
-
-    .file-note {
-      margin-top: 10px;
-      padding: 12px 14px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .file-note code {
-      color: #d8ebff;
-      font-size: 0.92rem;
-    }
-
-    .contact-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .contact-card {
-      padding: 22px;
-    }
-
-    .contact-card h3 {
-      margin-top: 0;
-      color: white;
-    }
-
-    .contact-list {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--muted);
-    }
-
-    .footer {
-      border-top: 1px solid var(--border);
-      padding: 24px 0 40px;
-      color: var(--muted);
-      text-align: center;
-      font-size: 0.95rem;
-    }
-
-    @media (max-width: 900px) {
-      .hero-grid,
-      .cert-grid,
-      .contact-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .stats {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .nav {
-        gap: 12px;
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .nav-links {
-        gap: 12px;
-      }
-
-      .hero {
-        padding-top: 42px;
-      }
-
-      .hero-panel,
-      .summary-panel,
-      .about-card,
-      .lab-card,
-      .contact-card {
-        padding: 20px;
-      }
-
-      .stats {
-        grid-template-columns: 1fr;
-      }
-
-      h1 {
-        font-size: 2rem;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="topbar">
-    <div class="container nav">
-      <div class="brand">Richard Vincent</div>
-      <div class="nav-links">
-        <a href="#about">About</a>
-        <a href="#training">Training</a>
-        <a href="#labs">Labs</a>
-        <a href="#contact">Contact</a>
-      </div>
-    </div>
-  </div>
-
-  <header class="hero">
-    <div class="container hero-grid">
-      <div class="hero-panel">
-        <div class="eyebrow">Cybersecurity Portfolio</div>
-        <h1>Richard Vincent</h1>
-        <p class="hero-subtitle">SOC Analyst | Cybersecurity | Network Defense | Security Operations</p>
-        <p class="hero-text">
-          I’m a cybersecurity professional with 9+ years of hands-on experience building,
-          configuring, and supporting enterprise IT networks across international environments.
-          I’m now bringing that infrastructure background into the SOC, with a focus on threat
-          detection, incident triage, and security operations.
-        </p>
-        <div class="cta-row">
-          <a class="btn btn-primary" href="https://www.linkedin.com/in/richvince" target="_blank">View LinkedIn</a>
-          <a class="btn btn-secondary" href="https://github.com/RichVince" target="_blank">View GitHub</a>
-        </div>
-        <div class="tag-row">
-          <span class="tag">Threat Detection</span>
-          <span class="tag">SIEM</span>
-          <span class="tag">Network Security</span>
-          <span class="tag">Incident Triage</span>
-          <span class="tag">Packet Tracer Labs</span>
-        </div>
-      </div>
-
-      <div class="summary-panel">
-        <h2>Quick Snapshot</h2>
-        <div class="stats">
-          <div class="stat">
-            <div class="stat-number">9+</div>
-            <div class="stat-label">Years in IT & Infrastructure</div>
-          </div>
-          <div class="stat">
-            <div class="stat-number">SOC</div>
-            <div class="stat-label">Current Career Focus</div>
-          </div>
-          <div class="stat">
-            <div class="stat-number">Qualys</div>
-            <div class="stat-label">Vulnerability Training</div>
-          </div>
-          <div class="stat">
-            <div class="stat-number">Splunk</div>
-            <div class="stat-label">Core User In Progress</div>
-          </div>
-        </div>
-        <ul class="focus-list">
-          <li>Transitioning from enterprise infrastructure into security operations</li>
-          <li>Building hands-on skills in monitoring, triage, and defensive analysis</li>
-          <li>Documenting practical Packet Tracer and cybersecurity labs</li>
-        </ul>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <section class="section" id="about">
-      <div class="container">
-        <h2 class="section-title">About Me</h2>
-        <p class="section-intro">
-          My advantage is simple: I’ve worked on the systems that security teams protect every day.
-          That gives me practical context when looking at connectivity, misconfigurations, and security risk.
-        </p>
-      <div class="card about-card">
-  <p>
-    My background includes enterprise network implementation, firewall policy enforcement,
-    technical support, VOIP/PBX systems, and real-world infrastructure troubleshooting across
-    client-facing environments.
-  </p>
-  <p>
-    Through cybersecurity training and hands-on labs, I’ve continued to strengthen my skills in
-    security monitoring, threat analysis, access control, vulnerability awareness, and defensive operations.
-  </p>
-  <p>
-    I’m currently targeting SOC Analyst and Junior Cybersecurity Analyst opportunities where I can contribute
-    from day one with a strong infrastructure foundation, practical troubleshooting ability, and a defender’s mindset.
-  </p>
- <p>
-  After completing Security+ and Splunk Core User, I plan to build into Governance, Risk, and Compliance (GRC)
-  so I can better connect hands-on security operations with risk, controls, and business security needs.
-</p>
-</div>
-      </div>
-    </section>
-
-    <section class="section" id="training">
-      <div class="container">
-        <h2 class="section-title">Certifications & Training</h2>
-        <p class="section-intro">
-          Industry training, certifications, and ongoing learning aligned to security operations, vulnerability management, and network defense.
-        </p>
-
-        <div class="cert-grid">
-          <div class="cert-card">
-            <h3>Google Cybersecurity Professional Certificate</h3>
-            <p>Completed foundational cybersecurity training focused on security operations, risk, incident response, and analysis.</p>
-            <span class="pill">Completed</span>
-          </div>
-
-          <div class="cert-card">
-            <h3>Qualys CyberSecurity Asset Management (CSAM)</h3>
-            <p>Training in asset visibility, discovery, and security posture awareness across managed environments.</p>
-            <span class="pill">Completed</span>
-          </div>
-
-          <div class="cert-card">
-            <h3>Qualys Vulnerability Management</h3>
-            <p>Hands-on vulnerability management concepts, scanning workflows, and remediation-focused analysis.</p>
-            <span class="pill">Completed</span>
-          </div>
-
-          <div class="cert-card">
-            <h3>Qualys VMDR</h3>
-            <p>Exposure to vulnerability detection and response workflows for security operations and risk reduction.</p>
-            <span class="pill">Completed</span>
-          </div>
-
-          <div class="cert-card">
-            <h3>Cisco Networking Basics</h3>
-            <p>Networking foundations including addressing, routing concepts, switching, and connectivity troubleshooting.</p>
-            <span class="pill">Completed</span>
-          </div>
-
-          <div class="cert-card">
-            <h3>Cisco Network Defense</h3>
-            <p>Training aligned with network defense concepts, traffic visibility, and security-focused thinking.</p>
-            <span class="pill">Completed</span>
-          </div>
-
-          <div class="cert-card">
-            <h3>CompTIA Security+</h3>
-            <p>Currently studying core security concepts, threats, mitigations, architecture, operations, and governance.</p>
-            <span class="pill">In Progress</span>
-          </div>
-
-          <div class="cert-card">
-            <h3>Splunk Core User</h3>
-            <p>Currently building skills in SPL, searches, fields, dashboards, and log analysis workflows.</p>
-            <span class="pill">In Progress</span>
-          </div>
-
-          <div class="cert-card">
-            <h3>Qualys Scanning Strategies and Best Practices</h3>
-            <p>Additional vulnerability scanning and assessment guidance to support better security visibility.</p>
-            <span class="pill">Completed</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="labs">
-  <div class="container">
-    <h2 class="section-title">Labs & Projects</h2>
-    <p class="section-intro">
-      A growing collection of practical labs demonstrating networking, security, and troubleshooting skills through hands-on work.
-    </p>
-
-    <div class="labs-grid">
-      <div class="card lab-card">
-        <h3>Wireless Router and Client Configuration Lab</h3>
-        <p>
-          Configured a home wireless router and connected multiple client devices in Packet Tracer
-          to simulate a small network environment. Practiced device connectivity, basic wireless setup,
-          and verification of network communication.
-        </p>
-        <p class="skills-line">
-          <strong>Skills:</strong> Wireless configuration, client connectivity, basic network setup, troubleshooting
-        </p>
-        <img class="lab-image" src="wireless-router-client-lab.png" alt="Wireless Router and Client Configuration Lab Screenshot">
-        <div class="lab-actions">
-          <a class="btn btn-primary" href="wireless-router-client-lab.pkt.pka" download>Download Lab File</a>
-        </div>
-      </div>
-
-      <div class="card lab-card">
-        <h3>Networking Basics SBA: Multi-LAN and Wireless Configuration Lab</h3>
-        <p>
-          Built and configured a Packet Tracer network with multiple LAN segments and a wireless network.
-          Practiced host cabling, DHCP and static IPv4 addressing, default gateway and DNS configuration,
-          wireless client connectivity, and end-to-end connectivity testing.
-        </p>
-        <p class="skills-line">
-          <strong>Skills:</strong> IPv4 addressing, DHCP, static IP configuration, DNS, default gateway configuration, wireless connectivity, connectivity testing, router and switch cabling
-        </p>
-        <img class="lab-image" src="networking-basics-sba-lab.png" alt="Networking Basics SBA Multi-LAN and Wireless Configuration Lab Screenshot">
-        <div class="lab-actions">
-          <a class="btn btn-primary" href="networking-basics-sba-lab.pkt.pka" download>Download Lab File</a>
-        </div>
-      </div>
-
-      <div class="card lab-card">
-        <h3>More Labs Coming Soon</h3>
-        <p class="coming-soon">
-          Additional Packet Tracer, networking, and cybersecurity labs will be added here as I continue
-          building my portfolio and documenting practical work.
-        </p>
-        <p class="skills-line">
-          <strong>Planned topics:</strong> VLANs, ACLs, traffic flow analysis, secure remote access, and network defense labs
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-    <section class="section" id="contact">
-      <div class="container">
-        <h2 class="section-title">Contact</h2>
-        <p class="section-intro">
-          Open to SOC Analyst and Junior Cybersecurity Analyst opportunities in Atlanta, GA.
-        </p>
-
-        <div class="contact-grid">
-          <div class="card contact-card">
-            <h3>Professional Links</h3>
-            <ul class="contact-list">
-              <li>LinkedIn: <a href="https://www.linkedin.com/in/richvince" target="_blank">linkedin.com/in/richvince</a></li>
-              <li>GitHub: <a href="https://github.com/RichVince" target="_blank">github.com/RichVince</a></li>
-              <li>Location: Atlanta, GA</li>
-            </ul>
-          </div>
-
-          <div class="card contact-card">
-            <h3>Current Focus</h3>
-            <ul class="contact-list">
-              <li>Threat monitoring and alert triage</li>
-              <li>Log analysis and defensive investigation</li>
-              <li>Security+ and Splunk Core User preparation</li>
-              <li>Building a stronger cybersecurity lab portfolio</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="container">
-      © 2026 Richard Vincent | Cybersecurity Portfolio
-    </div>
-  </footer>
-</body>
-</html>
+Lab Title
+Examining Telnet and SSH in Wireshark
+
+Goal
+To demonstrate the security differences between Telnet and SSH by capturing and analyzing both types of remote sessions in Wireshark.
+The lab teaches why SSH is preferred for secure remote administration.
+
+Tools Used
+Security Workstation VM (analyst / cyberops)
+
+Wireshark (packet capture and protocol analysis)
+
+Telnet client
+
+SSH client
+
+What I Did
+Started Wireshark and captured traffic on the Loopback (lo) interface.
+
+Opened a Telnet session to localhost and logged in.
+
+Stopped the capture and used Follow → TCP Stream to view Telnet traffic.
+
+Observed that the entire Telnet session—including username and password—appeared in plaintext.
+
+Started a new Wireshark capture.
+
+Opened an SSH session to localhost, accepted the host key, and logged in.
+
+Stopped the capture and again used Follow → TCP Stream.
+
+Observed that SSH traffic was encrypted and unreadable.
+
+What I Observed
+Telnet
+Wireshark displayed all session data in plaintext, including:
+
+Username (with duplicated characters due to Telnet echo)
+
+Password (“cyberops” shown clearly)
+
+Terminal output
+
+The TCP stream was fully readable, confirming Telnet does not encrypt data.
+
+SSH
+Wireshark showed:
+
+SSH version exchange
+
+Key exchange algorithms
+
+Encrypted payloads
+
+The TCP stream was completely unreadable, showing only ciphertext.
+
+No credentials or commands were visible.
+
+Why It Matters
+Telnet sends all data unencrypted, making it vulnerable to:
+
+Credential theft
+
+Session hijacking
+
+Packet sniffing
+
+SSH encrypts:
+
+Usernames
+
+Passwords
+
+Commands
+
+Session output
+
+In a SOC or cybersecurity role, understanding this difference is critical because:
+
+Analysts must identify insecure protocols on networks.
+
+Attackers often exploit plaintext protocols like Telnet.
+
+Secure remote administration is essential for protecting systems.
+
+SSH is the industry standard because it prevents attackers from reading or manipulating remote sessions.
