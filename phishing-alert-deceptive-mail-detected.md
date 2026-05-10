@@ -192,3 +192,14 @@ This investigation reinforced several important security lessons:
 This investigation involved analyzing a phishing alert tied to a deceptive email campaign delivering a suspicious ZIP artifact. By reviewing the alert details, parsing the email content, assessing the artifact, and considering supporting threat intelligence, I determined that the alert was a **true positive phishing attempt**.
 
 This project demonstrates my ability to think through an alert from both the attacker and defender perspective and apply a structured SOC investigation process.
+
+## Evidence
+
+### Alert Summary
+![Alert Summary](images-alert-summary.png)
+
+### Phishing Email
+![Phishing Email](images-phishing-email.png)
+
+### VirusTotal Analysis
+![VirusTotal Analysis](images-virustotal-result.png)
