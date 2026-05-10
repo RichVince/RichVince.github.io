@@ -176,3 +176,11 @@ This investigation reinforced several key lessons:
 ## Summary
 
 In this investigation, I analyzed suspicious web log activity and identified repeated attempts to inject encoded external URLs into a query parameter. The payload structure, obfuscation techniques, and repeated requests from the same source indicated **open redirection probing**. Although the server responded with **HTTP 400** errors, the activity was still useful from a SOC perspective because it revealed attacker behavior and highlighted the importance of secure input validation.
+
+## Evidence
+
+### Suspicious Open Redirection Requests
+![Suspicious Open Redirection Requests](open-redirection-log.png)
+
+### Identified Attacker IP and Targeted Parameter
+![Identified Attacker IP and Targeted Parameter](open-redirection-findings.png)
