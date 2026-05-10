@@ -1,4 +1,4 @@
-# SOC Investigation: Phishing Alert – Deceptive Mail Detected
+# phishing-alert-deceptive-mail-detected.md
 
 ## Project Overview
 
