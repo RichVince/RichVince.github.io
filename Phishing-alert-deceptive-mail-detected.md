@@ -1,4 +1,4 @@
-# phishing-alert-deceptive-mail-detected.md
+# Phishing-alert-deceptive-mail-detected.md
 
 ## Project Overview
 
