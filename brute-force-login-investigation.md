@@ -180,3 +180,8 @@ This investigation reinforced several important lessons:
 In this investigation, I analyzed suspicious web log activity involving repeated login attempts, credentials passed in URL parameters, and abnormal account creation behavior from source IP **234.161.112.162**. Based on the request sequence and authentication-focused activity, I assessed the behavior as **suspicious brute-force or login abuse activity**.
 
 This project demonstrates my ability to analyze authentication-related logs, identify suspicious user-access patterns, and apply a structured SOC investigation process.
+
+## Evidence
+
+### Suspicious Brute-Force Login Attempts
+![Suspicious Brute-Force Login Attempts](brute-force-login-requests.png)
