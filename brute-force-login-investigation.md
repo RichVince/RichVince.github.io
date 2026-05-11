@@ -185,3 +185,5 @@ This project demonstrates my ability to analyze authentication-related logs, ide
 
 ### Suspicious Brute-Force Login Attempts
 ![Suspicious Brute-Force Login Attempts](brute-force-login-requests.png)
+
+Repeated POST /login requests from source IP 146.241.73.240 over a short time window, consistent with brute-force or login abuse behavior.
