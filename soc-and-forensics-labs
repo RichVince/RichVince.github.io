@@ -1,0 +1,53 @@
+# Cybersecurity Labs Portfolio
+
+Hands-on cybersecurity lab portfolio showcasing practical experience in **SOC analysis, digital forensics, incident response, and evidence recovery**.
+
+## About
+This repository highlights lab projects completed in a controlled security training environment using tools such as **Wazuh, Hydra, TestDisk, and The Sleuth Kit (TSK)**. These projects demonstrate my ability to investigate suspicious activity, analyze logs, recover deleted evidence, and work with forensic drive images.
+
+## Featured Projects
+
+### Wazuh Logon Event Detection
+Used **Wazuh** to investigate suspicious authentication activity, including password-guessing attacks and Windows administrative share access. Reviewed alerts tied to failed and successful logons and analyzed SIEM-generated security events.
+
+### Anti-Forensics Detection with Wazuh
+Simulated anti-forensics behavior by clearing Windows event logs and then verified the related detection in Wazuh. This lab demonstrated how defenders can identify attempts to hide attacker activity.
+
+### Hidden Partition Forensic Analysis
+Analyzed a raw drive image to identify a **hidden logical partition** using forensic tools such as `fdisk`, `testdisk`, `mmls`, `fsstat`, `fls`, and `istat`. Mounted the hidden partition and confirmed recovered evidence.
+
+### Deleted File Recovery
+Recovered deleted files from an **NTFS drive image** using `tsk_recover`, then reviewed the restored file structure to identify recovered evidence in subdirectories.
+
+### File Carving from a Damaged Image
+Recovered files from a damaged FAT image after normal mounting and file-system analysis failed. Used **TestDisk** to rebuild access in memory and carve recoverable files from the image.
+
+## Skills Demonstrated
+- SIEM alert investigation
+- Log analysis and event correlation
+- Brute-force / suspicious logon detection
+- Anti-forensics detection
+- Drive image analysis
+- Hidden partition discovery
+- Deleted file recovery
+- File carving
+- Linux forensic workflows
+
+## Tools Used
+- Wazuh
+- Hydra
+- TestDisk
+- The Sleuth Kit (TSK)
+- Kali Linux
+- Windows Event Viewer
+- RDP / SMB
+
+## Goal
+This portfolio reflects my progress in building practical cybersecurity skills relevant to roles such as:
+- SOC Analyst
+- Cybersecurity Analyst
+- Incident Response Analyst
+- Digital Forensics / DFIR Analyst
+
+## Ethical Use
+All work in this repository was completed in authorized lab environments for educational and defensive security training purposes only.
