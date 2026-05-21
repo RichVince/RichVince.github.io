@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brute-Force Login Investigation | Richard Vincent</title>
+  <meta name="description" content="Richard Vincent SOC portfolio project: Brute-Force Login Investigation." />
+  <style>
+
+    :root {
+      --bg: #030712;
+      --panel: rgba(9, 17, 31, 0.9);
+      --text: #eef8ff;
+      --muted: #96a9c2;
+      --faint: #62748d;
+      --line: rgba(148, 163, 184, 0.18);
+      --line-strong: rgba(34, 211, 238, 0.32);
+      --cyan: #22d3ee;
+      --purple: #7c3aed;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #fb7185;
+      --shadow: 0 28px 90px rgba(0, 0, 0, 0.5);
+      --max: 1180px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.20), transparent 32rem),
+        radial-gradient(circle at 88% 8%, rgba(124, 58, 237, 0.18), transparent 34rem),
+        linear-gradient(135deg, #020617 0%, #050914 48%, #020617 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.65;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(34, 211, 238, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black 0%, transparent 78%);
+      z-index: -2;
+    }
+    a { color: inherit; text-decoration: none; }
+    code {
+      display: inline-block;
+      padding: 2px 6px;
+      border: 1px solid rgba(34, 211, 238, 0.16);
+      border-radius: 6px;
+      color: #dbeafe;
+      background: rgba(15, 23, 42, 0.72);
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.92em;
+    }
+    .shell { width: min(94%, var(--max)); margin: 0 auto; }
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      border-bottom: 1px solid var(--line);
+      background: rgba(3, 7, 18, 0.78);
+      backdrop-filter: blur(18px);
+    }
+    .topbar-inner {
+      min-height: 72px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 950; letter-spacing: -0.03em;
+    }
+    .brand-orb {
+      width: 38px; height: 38px; display: grid; place-items: center;
+      border-radius: 999px; color: #020617;
+      background: radial-gradient(circle at 35% 30%, #fff, var(--cyan) 38%, var(--purple));
+      box-shadow: 0 0 34px rgba(34, 211, 238, 0.3);
+    }
+    .nav-links {
+      display: flex; flex-wrap: wrap; gap: 14px; justify-content: flex-end;
+      color: var(--muted); font-size: 0.9rem; font-weight: 800;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+    .hero { padding: 70px 0 44px; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+    .hero-card, .summary-panel, .section-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--panel), rgba(3, 7, 18, 0.7));
+      box-shadow: 0 16px 46px rgba(0,0,0,0.24);
+    }
+    .hero-card {
+      padding: 34px;
+      border-radius: 34px;
+      border-color: var(--line-strong);
+      background:
+        radial-gradient(circle at top right, rgba(34,211,238,0.14), transparent 24rem),
+        linear-gradient(180deg, rgba(9,17,31,0.94), rgba(3,7,18,0.82));
+      box-shadow: var(--shadow);
+    }
+    .eyebrow, .section-label {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding: 8px 12px;
+      border: 1px solid rgba(34,211,238,0.26);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(34,211,238,0.08);
+      font-size: 0.76rem;
+      font-weight: 950;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 18px var(--green); }
+    h1 {
+      max-width: 820px;
+      margin-bottom: 18px;
+      font-size: clamp(2.75rem, 6vw, 5.7rem);
+      line-height: 0.9;
+      letter-spacing: -0.085em;
+    }
+    .gradient {
+      background: linear-gradient(135deg, #fff, var(--cyan) 42%, #a78bfa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .lead { max-width: 850px; color: var(--muted); font-size: 1.08rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 46px; padding: 12px 16px;
+      border-radius: 15px; border: 1px solid transparent;
+      font-weight: 950; transition: 0.2s ease;
+    }
+    .btn-primary { color: #020617; background: linear-gradient(135deg, var(--cyan), #60a5fa); box-shadow: 0 16px 42px rgba(34,211,238,0.22); }
+    .btn-secondary { color: var(--text); background: rgba(255,255,255,0.05); border-color: rgba(148,163,184,0.22); }
+    .btn:hover { transform: translateY(-2px); border-color: rgba(34,211,238,0.52); box-shadow: 0 18px 44px rgba(34,211,238,0.12); }
+    .summary-panel { padding: 26px; border-radius: 30px; }
+    .summary-panel h2 { margin-bottom: 16px; font-size: 1.35rem; letter-spacing: -0.03em; }
+    .summary-list { display: grid; gap: 12px; list-style: none; }
+    .summary-list li {
+      display: grid; gap: 4px; padding: 13px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+    }
+    .summary-list strong { color: var(--text); font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .summary-list span { color: var(--muted); }
+    .severity-medium { color: #ffd28a !important; font-weight: 900; }
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 28px;
+      align-items: start;
+      padding: 32px 0 80px;
+    }
+    .toc {
+      position: sticky; top: 96px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(9,17,31,0.82);
+    }
+    .toc h2 { margin-bottom: 14px; font-size: 1rem; }
+    .toc a {
+      display: block; padding: 9px 0;
+      color: var(--muted);
+      border-bottom: 1px solid rgba(148,163,184,0.1);
+      font-size: 0.92rem;
+    }
+    .toc a:hover { color: var(--cyan); }
+    .content { display: grid; gap: 20px; }
+    .section-card { padding: 26px; border-radius: 26px; }
+    .section-card h2 { margin-bottom: 12px; font-size: 1.35rem; line-height: 1.2; letter-spacing: -0.04em; }
+    .section-card p, .section-card li { color: var(--muted); }
+    .section-card ul { padding-left: 20px; margin-top: 10px; }
+    .section-card li { margin-bottom: 8px; }
+    .timeline { display: grid; gap: 10px; margin-top: 14px; }
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 14px;
+      padding: 13px 14px;
+      border: 1px solid rgba(148,163,184,0.16);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+    }
+    .timeline-row strong { color: var(--cyan); font-family: Consolas, Monaco, monospace; }
+    .timeline-row span { color: var(--muted); }
+    .ioc-grid, .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .ioc {
+      display: inline-flex; padding: 9px 11px;
+      border: 1px solid rgba(34,211,238,0.18);
+      border-radius: 999px;
+      color: #dbeafe;
+      background: rgba(255,255,255,0.05);
+      font-size: 0.92rem;
+    }
+    .callout {
+      margin-top: 12px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.045);
+    }
+    .verdict { border-color: rgba(251,113,133,0.34); background: rgba(251,113,133,0.08); }
+    .recommendation { border-color: rgba(34,197,94,0.30); background: rgba(34,197,94,0.08); }
+    .notes { border-color: rgba(34,211,238,0.28); background: rgba(34,211,238,0.07); }
+    .evidence-card {
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+    .evidence-card img { width: 100%; display: block; }
+    .evidence-card p { padding: 16px; color: #cbd5e1; font-size: 0.94rem; }
+    .footer-note {
+      padding: 20px 0 34px;
+      border-top: 1px solid var(--line);
+      color: var(--faint);
+      text-align: center;
+      font-size: 0.92rem;
+    }
+    @media (max-width: 980px) { .hero-grid, .layout { grid-template-columns: 1fr; } .toc { position: static; } }
+    @media (max-width: 700px) {
+      .topbar-inner { flex-direction: column; align-items: flex-start; padding: 16px 0; }
+      .nav-links { justify-content: flex-start; }
+      .hero-card, .summary-panel, .section-card { padding: 22px; border-radius: 24px; }
+      .timeline-row { grid-template-columns: 1fr; gap: 4px; }
+    }
+
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a href="index.html" class="brand" aria-label="Back to Richard Vincent SOC portfolio">
+        <span class="brand-orb">RV</span>
+        <span>Richard Vincent</span>
+      </a>
+      <nav class="nav-links" aria-label="Project navigation">
+        <a href="index.html#investigations">Investigations</a>
+        <a href="index.html#labs">Labs</a>
+        <a href="index.html#training">Training</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div class="hero-card">
+          <div class="eyebrow"><span class="dot"></span> SOC Investigation</div>
+          <h1>Brute-Force <span class="gradient">Login Investigation</span></h1>
+          <p class="lead">Public-facing SOC investigation documenting suspicious authentication activity, repeated login requests, credential submission patterns, account creation behavior, analyst notes, MITRE mapping, and remediation recommendations.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="index.html#investigations">Back to SOC Portfolio</a>
+            <a class="btn btn-secondary" href="https://github.com/RichVince/RichVince.github.io" target="_blank" rel="noopener">View GitHub Repository</a>
+          </div>
+        </div>
+
+        <aside class="summary-panel" aria-label="Investigation summary">
+          <h2>Investigation Snapshot</h2>
+          <ul class="summary-list">
+            <li><strong>Investigation Type</strong><span>Authentication / Login Abuse</span></li>
+            <li><strong>Source IP</strong><span>234.161.112.162 / 146.241.73.240</span></li>
+            <li><strong>Severity</strong><span class="severity-medium">Medium</span></li>
+            <li><strong>Final Classification</strong><span>Suspicious Activity - Brute-Force / Login Abuse Detected</span></li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="shell layout">
+      <aside class="toc" aria-label="Table of contents">
+        <h2>Case Sections</h2>
+        <a href="#overview">Project Overview</a>
+        <a href="#objective">Objective</a>
+        <a href="#timeline">Investigation Timeline</a>
+        <a href="#log-source">Log Source</a>
+        <a href="#indicators">Key Indicators</a>
+        <a href="#analysis">Analysis</a>
+        <a href="#analyst-notes">Analyst Notes</a>
+        <a href="#mitre">MITRE Mapping</a>
+        <a href="#verdict">Final Verdict</a>
+        <a href="#recommendations">Recommendations</a>
+        <a href="#lessons">Lessons Learned</a>
+        <a href="#evidence">Evidence</a>
+      </aside>
+
+      <div class="content">
+        <section class="section-card" id="overview">
+          <span class="section-label">01 Overview</span>
+          <h2>Project Overview</h2>
+          <p>This investigation analyzed web application log activity to identify possible brute-force and suspicious login behavior. The review focused on repeated login-page requests, credential submission patterns, account creation activity, and repeated requests from the same source IP.</p>
+        </section>
+
+        <section class="section-card" id="objective">
+          <span class="section-label">02 Objective</span>
+          <h2>Objective</h2>
+          <p>The objective was to determine whether the observed web requests represented normal user activity or suspicious authentication-related behavior consistent with brute-force attempts or login abuse.</p>
+          <ul>
+            <li>Repeated access to the login page</li>
+            <li>Suspicious credential submission patterns</li>
+            <li>Account creation flow activity</li>
+            <li>Repeated requests from the same source IP</li>
+            <li>Attacker behavior before and after login attempts</li>
+          </ul>
+        </section>
+
+        <section class="section-card" id="timeline">
+          <span class="section-label">03 Timeline</span>
+          <h2>Investigation Timeline</h2>
+          <div class="timeline">
+            <div class="timeline-row"><strong>09:10</strong><span>Repeated authentication-related requests identified in web logs.</span></div>
+            <div class="timeline-row"><strong>09:14</strong><span>Source IP activity reviewed and repeated requests correlated.</span></div>
+            <div class="timeline-row"><strong>09:19</strong><span>Login and credential submission patterns analyzed.</span></div>
+            <div class="timeline-row"><strong>09:24</strong><span>Account creation and profile save activity reviewed.</span></div>
+            <div class="timeline-row"><strong>09:30</strong><span>Activity classified as suspicious authentication behavior.</span></div>
+            <div class="timeline-row"><strong>09:35</strong><span>Remediation and monitoring recommendations documented.</span></div>
+          </div>
+        </section>
+
+        <section class="section-card" id="log-source">
+          <span class="section-label">04 Log Source</span>
+          <h2>Log Source</h2>
+          <p>The investigation was based on web log entries showing repeated activity from source IP <code>234.161.112.162</code>. Evidence screenshots also show repeated login attempts from source IP <code>146.241.73.240</code>, which should be reviewed as part of the same authentication-abuse pattern.</p>
+        </section>
+
+        <section class="section-card" id="indicators">
+          <span class="section-label">05 Indicators</span>
+          <h2>Key Indicators Observed</h2>
+          <div class="ioc-grid">
+            <span class="ioc">Repeated login-page requests</span>
+            <span class="ioc">Credential parameters in URL</span>
+            <span class="ioc">uid=test&amp;pw=test</span>
+            <span class="ioc">Account creation requests</span>
+            <span class="ioc">Single-source activity pattern</span>
+            <span class="ioc">Abnormal authentication sequence</span>
+          </div>
+        </section>
+
+        <section class="section-card" id="analysis">
+          <span class="section-label">06 Analysis</span>
+          <h2>Investigation Analysis</h2>
+          <p>The logs showed repeated access to <code>/login</code> and requests containing credential parameters such as <code>uid=test&amp;pw=test</code>. Credentials appearing directly in URL parameters are suspicious because they may indicate insecure handling, attacker-driven testing, or scripted authentication abuse.</p>
+          <p>The same source also accessed account creation and profile creation functionality, including requests containing values such as <code>action=new</code>, <code>uid=test</code>, <code>pw=test</code>, and <code>is_author=True</code>. This suggested that the actor was not only testing login access, but also account creation or privilege-related behavior.</p>
+        </section>
+
+        <section class="section-card" id="analyst-notes">
+          <span class="section-label">07 Analyst Notes</span>
+          <h2>Analyst Notes</h2>
+          <div class="callout notes">
+            <p>The activity pattern was not limited to one failed login attempt. The sequence included repeated authentication requests, account-related pages, and profile creation behavior, which increased suspicion that the actor was testing application authentication and user-management controls.</p>
+            <p>Even without confirmed account compromise, this behavior should be documented because brute-force attempts and login abuse often precede unauthorized access or privilege escalation attempts.</p>
+          </div>
+        </section>
+
+        <section class="section-card" id="mitre">
+          <span class="section-label">08 MITRE Mapping</span>
+          <h2>MITRE ATT&amp;CK Mapping</h2>
+          <ul>
+            <li><strong>T1110</strong> - Brute Force</li>
+            <li><strong>T1078</strong> - Valid Accounts, if the actor successfully authenticates</li>
+            <li>Possible account manipulation concerns if user creation or privilege-related parameters are abused</li>
+          </ul>
+        </section>
+
+        <section class="section-card" id="verdict">
+          <span class="section-label">09 Verdict</span>
+          <h2>Final Verdict</h2>
+          <div class="callout verdict">
+            <p><strong>Suspicious Activity - Brute-Force / Login Abuse Detected</strong></p>
+            <p>The activity was assessed as suspicious because it involved repeated authentication-related requests, credential submission attempts, and abnormal account-related behavior from the same source IP.</p>
+          </div>
+        </section>
+
+        <section class="section-card" id="recommendations">
+          <span class="section-label">10 Recommendations</span>
+          <h2>Recommended Remediation Actions</h2>
+          <div class="callout recommendation">
+            <ul>
+              <li>Enforce account lockout or rate-limiting controls</li>
+              <li>Prevent credentials from being transmitted in URL parameters</li>
+              <li>Review account creation and privilege assignment logic</li>
+              <li>Monitor for repeated login failures or repeated requests from a single IP</li>
+              <li>Block or challenge suspicious IPs if behavior continues</li>
+              <li>Review logs for any successful account creation or unauthorized access</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section-card" id="lessons">
+          <span class="section-label">11 Lessons Learned</span>
+          <h2>Lessons Learned</h2>
+          <ul>
+            <li>Repeated login activity from a single source can indicate brute-force or testing behavior.</li>
+            <li>Credentials in URLs are a security weakness and a strong investigation clue.</li>
+            <li>Account creation flows should be monitored for abuse.</li>
+            <li>Authentication logs are critical for detecting attacker behavior early.</li>
+            <li>Even unsuccessful login abuse attempts should be documented and reviewed.</li>
+          </ul>
+        </section>
+
+        <section class="section-card" id="evidence">
+          <span class="section-label">Evidence</span>
+          <h2>Investigation Evidence</h2>
+          <p>Selected screenshots from the investigation workflow. These visuals support the written analysis and help show the investigation process.</p>
+          <div class="evidence-grid">
+            <div class="evidence-card">
+              <img src="brute-force-login-requests.png" alt="Suspicious brute-force login attempts">
+              <p>Repeated POST /login requests over a short time window, consistent with brute-force or login abuse behavior.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="index.html#investigations">Back to Investigations</a>
+          <a class="btn btn-secondary" href="index.html#contact">Contact Richard</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer-note">
+    <div class="shell">Richard Vincent | SOC Investigation Project</div>
+  </footer>
+</body>
+</html>
