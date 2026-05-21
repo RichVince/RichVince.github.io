@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phishing Email Investigation | Richard Vincent</title>
+  <meta name="description" content="Richard Vincent SOC portfolio project covering phishing email analysis, severity classification, investigation timeline, indicators, MITRE ATT&CK mapping, analyst notes, detection opportunities, and containment recommendations." />
+  <style>
+    :root {
+      --bg: #030712;
+      --panel: rgba(9, 17, 31, 0.9);
+      --panel-2: rgba(15, 23, 42, 0.88);
+      --text: #eef8ff;
+      --muted: #96a9c2;
+      --faint: #62748d;
+      --line: rgba(148, 163, 184, 0.18);
+      --line-strong: rgba(34, 211, 238, 0.32);
+      --cyan: #22d3ee;
+      --purple: #7c3aed;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #fb7185;
+      --shadow: 0 28px 90px rgba(0, 0, 0, 0.5);
+      --max: 1180px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.20), transparent 32rem),
+        radial-gradient(circle at 88% 8%, rgba(124, 58, 237, 0.18), transparent 34rem),
+        linear-gradient(135deg, #020617 0%, #050914 48%, #020617 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.65;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(34, 211, 238, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black 0%, transparent 78%);
+      z-index: -2;
+    }
+    a { color: inherit; text-decoration: none; }
+    code {
+      display: inline-block;
+      padding: 2px 6px;
+      border: 1px solid rgba(34, 211, 238, 0.16);
+      border-radius: 6px;
+      color: #dbeafe;
+      background: rgba(15, 23, 42, 0.72);
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.92em;
+    }
+    .shell { width: min(94%, var(--max)); margin: 0 auto; }
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      border-bottom: 1px solid var(--line);
+      background: rgba(3, 7, 18, 0.78);
+      backdrop-filter: blur(18px);
+    }
+    .topbar-inner {
+      min-height: 72px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 950; letter-spacing: -0.03em;
+    }
+    .brand-orb {
+      width: 38px; height: 38px; display: grid; place-items: center;
+      border-radius: 999px; color: #020617;
+      background: radial-gradient(circle at 35% 30%, #fff, var(--cyan) 38%, var(--purple));
+      box-shadow: 0 0 34px rgba(34, 211, 238, 0.3);
+    }
+    .nav-links {
+      display: flex; flex-wrap: wrap; gap: 14px; justify-content: flex-end;
+      color: var(--muted); font-size: 0.9rem; font-weight: 800;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+    .hero { padding: 70px 0 44px; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+    .hero-card, .summary-panel, .section-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--panel), rgba(3, 7, 18, 0.7));
+      box-shadow: 0 16px 46px rgba(0,0,0,0.24);
+    }
+    .hero-card {
+      padding: 34px;
+      border-radius: 34px;
+      border-color: var(--line-strong);
+      background:
+        radial-gradient(circle at top right, rgba(34,211,238,0.14), transparent 24rem),
+        linear-gradient(180deg, rgba(9,17,31,0.94), rgba(3,7,18,0.82));
+      box-shadow: var(--shadow);
+    }
+    .eyebrow, .section-label {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding: 8px 12px;
+      border: 1px solid rgba(34,211,238,0.26);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(34,211,238,0.08);
+      font-size: 0.76rem;
+      font-weight: 950;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 18px var(--green); }
+    h1 {
+      max-width: 820px;
+      margin-bottom: 18px;
+      font-size: clamp(2.75rem, 6vw, 5.7rem);
+      line-height: 0.9;
+      letter-spacing: -0.085em;
+    }
+    .gradient {
+      background: linear-gradient(135deg, #fff, var(--cyan) 42%, #a78bfa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .lead { max-width: 850px; color: var(--muted); font-size: 1.08rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 46px; padding: 12px 16px;
+      border-radius: 15px; border: 1px solid transparent;
+      font-weight: 950; transition: 0.2s ease;
+    }
+    .btn-primary { color: #020617; background: linear-gradient(135deg, var(--cyan), #60a5fa); box-shadow: 0 16px 42px rgba(34,211,238,0.22); }
+    .btn-secondary { color: var(--text); background: rgba(255,255,255,0.05); border-color: rgba(148,163,184,0.22); }
+    .btn:hover { transform: translateY(-2px); border-color: rgba(34,211,238,0.52); box-shadow: 0 18px 44px rgba(34,211,238,0.12); }
+    .summary-panel { padding: 26px; border-radius: 30px; }
+    .summary-panel h2 { margin-bottom: 16px; font-size: 1.35rem; letter-spacing: -0.03em; }
+    .summary-list { display: grid; gap: 12px; list-style: none; }
+    .summary-list li {
+      display: grid; gap: 4px; padding: 13px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+    }
+    .summary-list strong { color: var(--text); font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .summary-list span { color: var(--muted); }
+    .severity-medium {
+      color: #ffd28a !important;
+      font-weight: 900;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 28px;
+      align-items: start;
+      padding: 32px 0 80px;
+    }
+    .toc {
+      position: sticky; top: 96px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(9,17,31,0.82);
+    }
+    .toc h2 { margin-bottom: 14px; font-size: 1rem; }
+    .toc a {
+      display: block; padding: 9px 0;
+      color: var(--muted);
+      border-bottom: 1px solid rgba(148,163,184,0.1);
+      font-size: 0.92rem;
+    }
+    .toc a:hover { color: var(--cyan); }
+    .content { display: grid; gap: 20px; }
+    .section-card { padding: 26px; border-radius: 26px; }
+    .section-card h2 { margin-bottom: 12px; font-size: 1.35rem; line-height: 1.2; letter-spacing: -0.04em; }
+    .section-card p, .section-card li { color: var(--muted); }
+    .section-card ul { padding-left: 20px; margin-top: 10px; }
+    .section-card li { margin-bottom: 8px; }
+    .timeline {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 14px;
+      padding: 13px 14px;
+      border: 1px solid rgba(148,163,184,0.16);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+    }
+    .timeline-row strong {
+      color: var(--cyan);
+      font-family: Consolas, Monaco, monospace;
+    }
+    .timeline-row span {
+      color: var(--muted);
+    }
+    .ioc-grid, .placeholder-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .ioc {
+      display: inline-flex; padding: 7px 10px;
+      border: 1px solid rgba(34,211,238,0.18);
+      border-radius: 999px;
+      color: #dbeafe;
+      background: rgba(255,255,255,0.05);
+      font-size: 0.92rem;
+    }
+    .callout {
+      margin-top: 12px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.045);
+    }
+    .verdict { border-color: rgba(251,113,133,0.34); background: rgba(251,113,133,0.08); }
+    .recommendation { border-color: rgba(34,197,94,0.30); background: rgba(34,197,94,0.08); }
+    .notes { border-color: rgba(34,211,238,0.28); background: rgba(34,211,238,0.07); }
+    .placeholder {
+      flex: 1 1 220px;
+      min-height: 140px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 18px;
+      border: 1px dashed rgba(34,211,238,0.35);
+      border-radius: 18px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.035);
+    }
+    .footer-note {
+      padding: 20px 0 34px;
+      border-top: 1px solid var(--line);
+      color: var(--faint);
+      text-align: center;
+      font-size: 0.92rem;
+    }
+    @media (max-width: 980px) { .hero-grid, .layout { grid-template-columns: 1fr; } .toc { position: static; } }
+    @media (max-width: 700px) {
+      .topbar-inner { flex-direction: column; align-items: flex-start; padding: 16px 0; }
+      .nav-links { justify-content: flex-start; }
+      .hero-card, .summary-panel, .section-card { padding: 22px; border-radius: 24px; }
+      .timeline-row { grid-template-columns: 1fr; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a href="index.html" class="brand" aria-label="Back to Richard Vincent SOC portfolio">
+        <span class="brand-orb">RV</span>
+        <span>Richard Vincent</span>
+      </a>
+      <nav class="nav-links" aria-label="Project navigation">
+        <a href="index.html#investigations">Investigations</a>
+        <a href="index.html#labs">Labs</a>
+        <a href="index.html#training">Training</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div class="hero-card">
+          <div class="eyebrow"><span class="dot"></span> SOC Investigation</div>
+          <h1>Enterprise <span class="gradient">Phishing Email</span> Investigation</h1>
+          <p class="lead">
+            Public-facing case study documenting the review of a deceptive phishing email, including severity classification, investigation timeline, email analysis, indicators, user risk, MITRE ATT&amp;CK mapping, analyst notes, detection opportunities, final classification, and recommended containment steps.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" href="index.html#investigations">Back to SOC Portfolio</a>
+            <a class="btn btn-secondary" href="https://github.com/RichVince/RichVince.github.io" target="_blank" rel="noopener">View GitHub Repository</a>
+          </div>
+        </div>
+
+        <aside class="summary-panel" aria-label="Investigation summary">
+          <h2>Investigation Snapshot</h2>
+          <ul class="summary-list">
+            <li><strong>Alert Rule</strong><span>SOC282 - Phishing Alert - Deceptive Mail Detected</span></li>
+            <li><strong>Event ID</strong><span>257</span></li>
+            <li><strong>Date / Time</strong><span>May 13, 2024 - 09:22 AM</span></li>
+            <li><strong>Initial Action</strong><span>Allowed</span></li>
+            <li><strong>Severity</strong><span class="severity-medium">Medium</span></li>
+            <li><strong>Final Classification</strong><span>True Positive - Phishing Attempt</span></li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="shell layout">
+      <aside class="toc" aria-label="Table of contents">
+        <h2>Case Sections</h2>
+        <a href="#alert-summary">Alert Summary</a>
+        <a href="#timeline">Investigation Timeline</a>
+        <a href="#email-analysis">Email Analysis</a>
+        <a href="#header-findings">Header Findings</a>
+        <a href="#ioc-analysis">IOC Analysis</a>
+        <a href="#threat-intel">Threat Intelligence Review</a>
+        <a href="#analyst-notes">Analyst Notes</a>
+        <a href="#detection-opportunities">Detection Opportunities</a>
+        <a href="#user-risk">User Risk</a>
+        <a href="#mitre-mapping">MITRE ATT&amp;CK Mapping</a>
+        <a href="#final-verdict">Final Verdict</a>
+        <a href="#containment">Containment Recommendation</a>
+        <a href="#lessons-learned">Lessons Learned</a>
+        <a href="#evidence">Evidence Placeholders</a>
+      </aside>
+
+      <div class="content">
+        <section class="section-card" id="alert-summary">
+          <span class="section-label">01 Alert Summary</span>
+          <h2>Alert Summary</h2>
+          <p>An inbound phishing alert was triggered after a suspicious email reached a user inbox without being blocked. The message was sent from <code>free@coffeeshoop.com</code> to <code>felix@letsdefend.io</code> through SMTP source <code>103.80.134.63</code> with the subject line <code>Free Coffee Voucher</code>.</p>
+        </section>
+
+        <section class="section-card" id="timeline">
+          <span class="section-label">02 Timeline</span>
+          <h2>Investigation Timeline</h2>
+          <p>This timeline summarizes the investigation workflow from alert review through classification and containment recommendation.</p>
+          <div class="timeline">
+            <div class="timeline-row"><strong>09:22</strong><span>Phishing alert triggered and case opened for review.</span></div>
+            <div class="timeline-row"><strong>09:24</strong><span>Email header details reviewed, including sender, recipient, subject, and source IP.</span></div>
+            <div class="timeline-row"><strong>09:28</strong><span>Suspicious URL and related artifact reputation checked.</span></div>
+            <div class="timeline-row"><strong>09:31</strong><span>Threat intelligence review completed using external enrichment.</span></div>
+            <div class="timeline-row"><strong>09:36</strong><span>Alert classified as a true positive phishing attempt.</span></div>
+            <div class="timeline-row"><strong>09:40</strong><span>Containment and detection improvement recommendations documented.</span></div>
+          </div>
+        </section>
+
+        <section class="section-card" id="email-analysis">
+          <span class="section-label">03 Email Analysis</span>
+          <h2>Email Analysis</h2>
+          <p>The phishing email leveraged social engineering techniques, including urgency and reward-based lures, to increase the likelihood of user interaction. Phrases such as <em>Hurry</em> and <em>This offer expires soon</em> supported the assessment that this was a deceptive message rather than a normal promotional email.</p>
+        </section>
+
+        <section class="section-card" id="header-findings">
+          <span class="section-label">04 Header Findings</span>
+          <h2>Header Findings</h2>
+          <ul>
+            <li><strong>Sender:</strong> <code>free@coffeeshoop.com</code></li>
+            <li><strong>Recipient:</strong> <code>felix@letsdefend.io</code></li>
+            <li><strong>SMTP Source IP:</strong> <code>103.80.134.63</code></li>
+            <li><strong>Subject:</strong> <code>Free Coffee Voucher</code></li>
+            <li><strong>Delivery Status:</strong> Allowed</li>
+            <li><strong>Severity:</strong> Medium</li>
+          </ul>
+        </section>
+
+        <section class="section-card" id="ioc-analysis">
+          <span class="section-label">05 Indicators</span>
+          <h2>IOC Analysis</h2>
+          <p>The main indicators reviewed during the investigation included the sender, source IP, lure subject, suspicious attachment or URL behavior, and impersonation indicators.</p>
+          <div class="ioc-grid" aria-label="Indicators of compromise">
+            <span class="ioc">free@coffeeshoop.com</span>
+            <span class="ioc">103.80.134.63</span>
+            <span class="ioc">Free Coffee Voucher</span>
+            <span class="ioc">Suspicious ZIP / URL</span>
+            <span class="ioc">Urgency-based lure</span>
+            <span class="ioc">Adobe login impersonation</span>
+            <span class="ioc">AsyncRAT-related artifact</span>
+          </div>
+        </section>
+
+        <section class="section-card" id="threat-intel">
+          <span class="section-label">06 Threat Intelligence</span>
+          <h2>Threat Intelligence Review</h2>
+          <p>The suspicious URL or related artifact was reviewed using external threat intelligence. Multiple detections supported the conclusion that the activity was malicious. Supporting analysis indicated that the URL imitated an Adobe login page and that the attachment behavior aligned with a malicious remote-access malware pattern.</p>
+        </section>
+
+        <section class="section-card" id="analyst-notes">
+          <span class="section-label">07 Analyst Notes</span>
+          <h2>Analyst Notes</h2>
+          <div class="callout notes">
+            <p>The delivery status of <strong>Allowed</strong> increased the user risk exposure because the phishing email successfully reached the mailbox without initial containment by email security controls.</p>
+            <p>The combination of a deceptive sender, urgency-based language, suspicious artifacts, and threat intelligence enrichment supported escalation from suspicious activity to a confirmed true positive phishing attempt.</p>
+          </div>
+        </section>
+
+        <section class="section-card" id="detection-opportunities">
+          <span class="section-label">08 Detection Opportunities</span>
+          <h2>Detection Opportunities</h2>
+          <p>Based on the investigation, the following areas could improve future detection or prevention:</p>
+          <ul>
+            <li>Email gateway filtering for suspicious sender domains and promotional lures from low-reputation infrastructure</li>
+            <li>URL reputation blocking for known malicious or newly suspicious links</li>
+            <li>Attachment sandboxing for ZIP files and payload-like behavior</li>
+            <li>User phishing awareness focused on urgency, fake rewards, and credential harvesting attempts</li>
+            <li>Domain and IP reputation monitoring for recurring phishing infrastructure</li>
+            <li>Mailbox search workflows to identify similar messages across the environment</li>
+          </ul>
+        </section>
+
+        <section class="section-card" id="user-risk">
+          <span class="section-label">09 User Risk</span>
+          <h2>User Risk</h2>
+          <p>Because the email was delivered successfully, the recipient was exposed to multiple possible risks:</p>
+          <ul>
+            <li>Credential theft through fake login capture</li>
+            <li>Malware execution if the attachment was opened</li>
+            <li>Initial access into the environment</li>
+            <li>Follow-on attacker activity after user interaction</li>
+          </ul>
+        </section>
+
+        <section class="section-card" id="mitre-mapping">
+          <span class="section-label">10 MITRE Mapping</span>
+          <h2>MITRE ATT&amp;CK Mapping</h2>
+          <ul>
+            <li><strong>T1566</strong> - Phishing</li>
+            <li><strong>T1566.001</strong> - Spearphishing Attachment</li>
+            <li><strong>T1566.002</strong> - Spearphishing Link</li>
+            <li><strong>T1204</strong> - User Execution</li>
+            <li>Credential harvesting through a deceptive login page</li>
+          </ul>
+        </section>
+
+        <section class="section-card" id="final-verdict">
+          <span class="section-label">11 Verdict</span>
+          <h2>Final Verdict</h2>
+          <div class="callout verdict">
+            <p><strong>True Positive - Phishing Attempt</strong></p>
+            <p>The alert was classified as malicious because it combined a deceptive sender, urgency-driven content, suspicious artifacts, and supporting threat intelligence indicating phishing and malware delivery behavior.</p>
+          </div>
+        </section>
+
+        <section class="section-card" id="containment">
+          <span class="section-label">12 Recommendation</span>
+          <h2>Containment Recommendation</h2>
+          <div class="callout recommendation">
+            <ul>
+              <li>Quarantine or remove the email from affected mailboxes</li>
+              <li>Block the sender address and related domain if confirmed malicious</li>
+              <li>Block associated URLs and file indicators</li>
+              <li>Contact the recipient to confirm whether they clicked the link or opened the attachment</li>
+              <li>Search for similar phishing messages across the environment</li>
+              <li>Update detections and user awareness guidance as needed</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section-card" id="lessons-learned">
+          <span class="section-label">13 Lessons Learned</span>
+          <h2>Lessons Learned</h2>
+          <ul>
+            <li>User awareness remains critical against phishing campaigns that use urgency and reward-based lures.</li>
+            <li>Threat intelligence enrichment improved triage confidence and supported accurate classification.</li>
+            <li>Early IOC validation helped reduce investigation time and supported faster containment recommendations.</li>
+            <li>Allowed delivery status should be reviewed carefully because it increases the chance of user interaction.</li>
+          </ul>
+        </section>
+
+        <section class="section-card" id="evidence">
+          <span class="section-label">14 Evidence</span>
+          <h2>Evidence Placeholders</h2>
+          <p>Recommended screenshots to add later. These placeholders can be replaced with images once the evidence files are ready.</p>
+          <div class="placeholder-grid">
+            <div class="placeholder">Email view screenshot</div>
+            <div class="placeholder">VirusTotal result screenshot</div>
+            <div class="placeholder">Suspicious URL analysis screenshot</div>
+            <div class="placeholder">Alert dashboard screenshot</div>
+          </div>
+        </section>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="index.html#investigations">Back to Investigations</a>
+          <a class="btn btn-secondary" href="index.html#contact">Contact Richard</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer-note">
+    <div class="shell">Richard Vincent | SOC Investigation Project</div>
+  </footer>
+</body>
+</html>
