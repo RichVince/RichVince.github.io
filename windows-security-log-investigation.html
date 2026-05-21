@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows Security Log Investigation | Richard Vincent</title>
+<style>
+:root{--bg:#fff;--text:#111;--muted:#555;--border:#ddd;--link:#0b57d0;--soft:#f7f7f7;--warn:#fff8e6;--warnb:#ead39a;--good:#f4fbf6;--goodb:#b9dcc2;--code:#f3f4f6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.65}.container{max-width:980px;margin:0 auto;padding:24px 20px 48px}
+.topnav{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px;font-size:.95rem}.topnav a,.site-title a,.back-link,a{color:var(--link)}.topnav a{text-decoration:none}.topnav a:hover,.back-link:hover,.btn:hover{text-decoration:underline}.site-title{margin:0 0 8px;font-size:1rem;font-weight:700}
+.hero{margin-bottom:28px}.kicker{font-size:.9rem;color:var(--muted);margin:0 0 8px}h1{margin:0 0 12px;font-size:2.1rem;line-height:1.2}.lead{margin:0 0 18px;color:var(--muted);max-width:800px}.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0 0}.meta div{border:1px solid var(--border);background:var(--soft);padding:12px 14px;border-radius:8px}.meta strong{display:block;margin-bottom:4px}
+section{margin-bottom:26px}h2{font-size:1.25rem;margin:0 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}p{margin:0 0 12px}ul{margin:0;padding-left:22px}li{margin-bottom:8px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid var(--border);padding:10px;text-align:left;vertical-align:top}th{background:var(--soft)}
+.callout{border:1px solid var(--border);border-left:4px solid #888;background:var(--soft);padding:14px 16px;border-radius:8px}.verdict{background:var(--warn);border-color:var(--warnb);border-left-color:#b7791f}.recommendation{background:var(--good);border-color:var(--goodb);border-left-color:#2d7d46}code{background:var(--code);padding:1px 5px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:.94em}
+.figure{margin:16px 0;border:1px solid var(--border);background:var(--soft);padding:12px;border-radius:8px}.figure img{max-width:100%;height:auto;display:block;border:1px solid var(--border);border-radius:6px;background:#fff}.figure figcaption{color:var(--muted);font-size:.92rem;margin-top:8px}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.btn{display:inline-block;border:1px solid var(--border);background:var(--soft);color:var(--text);text-decoration:none;padding:10px 14px;border-radius:8px;font-size:.95rem}.footer-note{margin-top:32px;color:var(--muted);font-size:.92rem;border-top:1px solid var(--border);padding-top:18px}@media(max-width:700px){.meta{grid-template-columns:1fr}h1{font-size:1.7rem}}
+</style>
+</head>
+<body><div class="container">
+<div class="site-title"><a href="/">Richard Vincent</a></div>
+<nav class="topnav" aria-label="Primary">
+  <a href="/#about">About</a>
+  <a href="/#certifications">Certifications</a>
+  <a href="/#network-labs">Network Labs</a>
+  <a href="/#security-labs">Security Labs</a>
+  <a href="/#investigations">Investigations</a>
+  <a href="/#skills">Skills</a>
+  <a href="/#contact">Contact</a>
+</nav>
+<a class="back-link" href="/#investigations">&larr; Back to Investigations</a>
+
+<header class="hero">
+<p class="kicker">SOC Investigation &amp; Windows Security Log Analysis</p>
+<h1>Windows Security Log Investigation: Suspicious Authentication Activity</h1>
+<p class="lead">This case study documents a Windows Security log investigation focused on failed logons, successful logons, privileged authentication events, and suspicious account activity using Event Viewer.</p>
+<div class="meta">
+<div><strong>Investigation Type</strong>Windows Authentication / Security Log Investigation</div>
+<div><strong>Tool Used</strong>Windows Event Viewer</div>
+<div><strong>Log Source</strong>Windows Security Logs</div>
+<div><strong>Severity</strong>Medium</div>
+<div><strong>Final Classification</strong>Suspicious Authentication Activity</div>
+<div><strong>Status</strong>Evidence screenshots pending</div>
+</div></header>
+<main>
+<section><h2>Scenario / Alert Summary</h2><p>Multiple authentication-related Windows Security events were reviewed to identify suspicious login behavior. The investigation focused on whether repeated failed logon attempts, successful logons after failures, or privileged account activity suggested brute-force attempts, compromised credentials, or unauthorized access.</p></section>
+<section><h2>Objective</h2><p>The objective was to determine whether observed authentication events represented normal user activity or suspicious behavior requiring escalation, containment, or additional monitoring.</p></section>
+<section><h2>Tools Used</h2><ul><li>Windows Event Viewer</li><li>Windows Security Logs</li><li>Authentication and account activity Event IDs</li><li>Filtered log review and event correlation</li></ul></section>
+<section><h2>Key Event IDs Reviewed</h2><table><thead><tr><th>Event ID</th><th>Description</th><th>SOC Relevance</th></tr></thead><tbody>
+<tr><td>4624</td><td>Successful logon</td><td>Confirms authentication and can identify logon type, account, and source system.</td></tr>
+<tr><td>4625</td><td>Failed logon</td><td>Useful for detecting brute-force attempts, password spraying, and invalid credential use.</td></tr>
+<tr><td>4634</td><td>Logoff</td><td>Helps build session timelines and validate account activity.</td></tr>
+<tr><td>4672</td><td>Special privileges assigned to new logon</td><td>Identifies privileged sessions that may require administrative review.</td></tr>
+<tr><td>4720</td><td>User account created</td><td>Relevant when investigating unauthorized account creation or persistence activity.</td></tr>
+</tbody></table></section>
+<section><h2>Investigation Timeline</h2><table><thead><tr><th>Time</th><th>Activity</th></tr></thead><tbody><tr><td>09:10</td><td>Security logs reviewed in Event Viewer</td></tr><tr><td>09:14</td><td>Failed logon events identified</td></tr><tr><td>09:20</td><td>Source account and host context reviewed</td></tr><tr><td>09:26</td><td>Authentication Event IDs correlated</td></tr><tr><td>09:35</td><td>Findings and recommendations documented</td></tr></tbody></table></section>
+<section><h2>Findings</h2><ul><li>Repeated failed logon attempts were observed in the Windows Security log.</li><li>Successful authentication occurred after multiple failed attempts.</li><li>Privileged logon events were reviewed for legitimacy.</li><li>Account activity required validation against expected user behavior.</li><li>Event timing suggested possible suspicious authentication behavior.</li></ul></section>
+<section><h2>Analyst Notes</h2><div class="callout"><p>Repeated failed logons may indicate password guessing, brute-force activity, credential stuffing, or user error. A successful logon following repeated failures increases the importance of validating the account owner, source system, logon type, and time of access.</p></div></section>
+<section><h2>MITRE ATT&amp;CK Mapping</h2><table><thead><tr><th>Technique</th><th>Relevance</th></tr></thead><tbody><tr><td><strong>T1110 - Brute Force</strong></td><td>Repeated failed authentication attempts may indicate password guessing or brute-force behavior.</td></tr><tr><td><strong>T1078 - Valid Accounts</strong></td><td>A successful logon after suspicious failures may indicate misuse of valid credentials.</td></tr></tbody></table></section>
+<section><h2>Final Verdict</h2><div class="callout verdict"><p><strong>Suspicious Authentication Activity Identified</strong></p><p>The log review showed authentication patterns that may indicate unauthorized login attempts or misuse of valid credentials. The evidence did not confirm full compromise by itself, but the behavior warranted additional review and monitoring.</p></div></section>
+<section><h2>Recommendations</h2><div class="callout recommendation"><ul><li>Review affected user account activity for legitimacy.</li><li>Enable MFA where possible.</li><li>Monitor repeated failed logon attempts.</li><li>Review or enforce account lockout policy.</li><li>Validate privileged account usage.</li><li>Preserve and export relevant logs for follow-up investigation.</li></ul></div></section>
+<section><h2>Evidence Screenshots to Add</h2><ul><li>Filtered Windows Security log showing Event ID 4625</li><li>Event ID 4624 details showing successful logon context</li><li>Event ID 4672 details showing privileged logon context</li><li>Filtered Event Viewer results showing correlated authentication activity</li></ul></section>
+</main>
+<div class="buttons"><a class="btn" href="/#investigations">Back to Investigations</a><a class="btn" href="https://github.com/RichVince/RichVince.github.io">View GitHub Repository</a></div>
+<p class="footer-note">This project is structured as a SOC case study. Add authentication screenshots before making it a featured investigation.</p>
+</div></body></html>

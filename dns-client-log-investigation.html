@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNS Client Log Investigation | Richard Vincent</title>
+<style>
+:root{--bg:#fff;--text:#111;--muted:#555;--border:#ddd;--link:#0b57d0;--soft:#f7f7f7;--warn:#fff8e6;--warnb:#ead39a;--good:#f4fbf6;--goodb:#b9dcc2;--code:#f3f4f6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.65}.container{max-width:980px;margin:0 auto;padding:24px 20px 48px}
+.topnav{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px;font-size:.95rem}.topnav a,.site-title a,.back-link,a{color:var(--link)}.topnav a{text-decoration:none}.topnav a:hover,.back-link:hover,.btn:hover{text-decoration:underline}.site-title{margin:0 0 8px;font-size:1rem;font-weight:700}
+.hero{margin-bottom:28px}.kicker{font-size:.9rem;color:var(--muted);margin:0 0 8px}h1{margin:0 0 12px;font-size:2.1rem;line-height:1.2}.lead{margin:0 0 18px;color:var(--muted);max-width:800px}.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0 0}.meta div{border:1px solid var(--border);background:var(--soft);padding:12px 14px;border-radius:8px}.meta strong{display:block;margin-bottom:4px}
+section{margin-bottom:26px}h2{font-size:1.25rem;margin:0 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}p{margin:0 0 12px}ul{margin:0;padding-left:22px}li{margin-bottom:8px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid var(--border);padding:10px;text-align:left;vertical-align:top}th{background:var(--soft)}
+.callout{border:1px solid var(--border);border-left:4px solid #888;background:var(--soft);padding:14px 16px;border-radius:8px}.verdict{background:var(--warn);border-color:var(--warnb);border-left-color:#b7791f}.recommendation{background:var(--good);border-color:var(--goodb);border-left-color:#2d7d46}code{background:var(--code);padding:1px 5px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:.94em}
+.figure{margin:16px 0;border:1px solid var(--border);background:var(--soft);padding:12px;border-radius:8px}.figure img{max-width:100%;height:auto;display:block;border:1px solid var(--border);border-radius:6px;background:#fff}.figure figcaption{color:var(--muted);font-size:.92rem;margin-top:8px}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.btn{display:inline-block;border:1px solid var(--border);background:var(--soft);color:var(--text);text-decoration:none;padding:10px 14px;border-radius:8px;font-size:.95rem}.footer-note{margin-top:32px;color:var(--muted);font-size:.92rem;border-top:1px solid var(--border);padding-top:18px}@media(max-width:700px){.meta{grid-template-columns:1fr}h1{font-size:1.7rem}}
+</style>
+</head>
+<body><div class="container">
+<div class="site-title"><a href="/">Richard Vincent</a></div>
+<nav class="topnav" aria-label="Primary">
+  <a href="/#about">About</a>
+  <a href="/#certifications">Certifications</a>
+  <a href="/#network-labs">Network Labs</a>
+  <a href="/#security-labs">Security Labs</a>
+  <a href="/#investigations">Investigations</a>
+  <a href="/#skills">Skills</a>
+  <a href="/#contact">Contact</a>
+</nav>
+<a class="back-link" href="/#investigations">&larr; Back to Investigations</a>
+
+<header class="hero">
+<p class="kicker">SOC Investigation &amp; Windows Event Log Analysis</p>
+<h1>DNS Client Log Investigation: Suspicious Domain Query Analysis</h1>
+<p class="lead">This case study documents the review of Windows DNS Client Operational logs to identify a suspicious domain query, collect endpoint DNS evidence, and recommend follow-up SOC actions.</p>
+<div class="meta">
+<div><strong>Investigation Type</strong>DNS Client Log Investigation</div>
+<div><strong>Tool Used</strong>Windows Event Viewer</div>
+<div><strong>Log Source</strong>Microsoft-Windows-DNS-Client/Operational</div>
+<div><strong>Severity</strong>Medium</div>
+<div><strong>Final Classification</strong>Suspicious Domain Resolution Activity</div>
+<div><strong>Primary Event ID</strong>3010</div>
+</div></header>
+<main>
+<section><h2>Scenario / Alert Summary</h2><p>During review of Windows DNS Client Operational logs, DNS activity was identified for a suspicious domain. The investigation focused on determining whether the query represented normal browsing activity, malware-related communication, or another form of unauthorized network activity.</p></section>
+<section><h2>Objective</h2><p>The objective was to review DNS-related Windows Event Logs, identify suspicious domain activity, document observed indicators, and determine whether additional containment or monitoring actions were required.</p></section>
+<section><h2>Tools Used</h2><ul><li>Windows Event Viewer</li><li>Microsoft-Windows-DNS-Client/Operational log</li><li>Event ID 3010 DNS Client Events</li><li>DNS query review and IOC documentation</li></ul></section>
+<section><h2>Evidence Collected</h2>
+<table><thead><tr><th>Field</th><th>Observed Value</th></tr></thead><tbody>
+<tr><td>Event ID</td><td>3010</td></tr>
+<tr><td>Computer</td><td><code>PC10.ad.structureality.com</code></td></tr>
+<tr><td>User SID</td><td><code>S-1-5-20</code></td></tr>
+<tr><td>Query Name</td><td><code>badsite.ru</code></td></tr>
+<tr><td>Query Type</td><td>A record</td></tr>
+<tr><td>DNS Server</td><td><code>fdf0:2413:6d1c:20::1</code></td></tr>
+</tbody></table>
+<figure class="figure"><img src="event7.png" alt="Windows Event Viewer filtered DNS Client Operational log showing Event ID 3010"><figcaption>Figure 1. Windows Event Viewer showing DNS Client Event ID 3010 entries in the DNS Client Operational log.</figcaption></figure>
+<figure class="figure"><img src="event5.png" alt="Windows Event Viewer Event ID 3010 details showing badsite.ru DNS query"><figcaption>Figure 2. Event ID 3010 details showing a DNS query for <code>badsite.ru</code>.</figcaption></figure>
+</section>
+<section><h2>Findings</h2><ul><li>A DNS query was recorded for the suspicious domain <code>badsite.ru</code>.</li><li>The event was logged under the Windows DNS Client Operational channel.</li><li>The query originated from host <code>PC10.ad.structureality.com</code>.</li><li>The DNS request required reputation validation and additional endpoint review.</li><li>DNS activity alone did not confirm compromise, but it provided useful evidence for SOC triage.</li></ul></section>
+<section><h2>Analyst Notes</h2><div class="callout"><p>Windows DNS Client Operational logs can provide strong endpoint-level visibility into domain resolution activity. Suspicious DNS queries may indicate phishing interaction, malware beaconing, command-and-control communication, or unauthorized browsing activity.</p></div></section>
+<section><h2>MITRE ATT&amp;CK Mapping</h2><table><thead><tr><th>Technique</th><th>Relevance</th></tr></thead><tbody><tr><td><strong>T1071.004 - Application Layer Protocol: DNS</strong></td><td>Adversaries may use DNS for command-and-control traffic, malware callbacks, or infrastructure communication.</td></tr><tr><td><strong>T1568 - Dynamic Resolution</strong></td><td>Malicious infrastructure may rely on DNS resolution to direct hosts toward attacker-controlled systems.</td></tr></tbody></table></section>
+<section><h2>Final Verdict</h2><div class="callout verdict"><p><strong>Suspicious DNS Activity Identified</strong></p><p>Windows DNS Client logs recorded a DNS query for a suspicious domain. The event did not confirm compromise by itself, but it warranted additional monitoring, domain reputation review, and investigation into related endpoint activity.</p></div></section>
+<section><h2>Recommendations</h2><div class="callout recommendation"><ul><li>Review the domain reputation using VirusTotal or another threat intelligence source.</li><li>Search for additional DNS requests to the same domain across the environment.</li><li>Review browser history, proxy logs, or endpoint security alerts associated with the host.</li><li>Block the domain if confirmed malicious.</li><li>Preserve relevant DNS and endpoint logs for follow-up investigation.</li></ul></div></section>
+</main>
+<div class="buttons"><a class="btn" href="/#investigations">Back to Investigations</a><a class="btn" href="https://github.com/RichVince/RichVince.github.io">View GitHub Repository</a></div>
+<p class="footer-note">This project is written in a SOC case-study format to demonstrate Windows Event Viewer analysis, DNS log review, IOC documentation, and analyst recommendations.</p>
+</div></body></html>
