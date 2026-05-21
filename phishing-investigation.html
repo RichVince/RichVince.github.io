@@ -262,6 +262,29 @@
       .hero-card, .summary-panel, .section-card { padding: 22px; border-radius: 24px; }
       .timeline-row { grid-template-columns: 1fr; gap: 4px; }
     }
+  
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+      margin-top: 22px;
+    }
+    .evidence-card {
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+    .evidence-card img {
+      width: 100%;
+      display: block;
+    }
+    .evidence-card p {
+      padding: 16px;
+      color: #cbd5e1;
+      font-size: 0.94rem;
+    }
+
   </style>
 </head>
 <body>
@@ -287,7 +310,7 @@
           <div class="eyebrow"><span class="dot"></span> SOC Investigation</div>
           <h1>Enterprise <span class="gradient">Phishing Email</span> Investigation</h1>
           <p class="lead">
-            Public-facing case study documenting the review of a deceptive phishing email, including severity classification, investigation timeline, email analysis, indicators, user risk, MITRE ATT&amp;CK mapping, analyst notes, detection opportunities, final classification, and recommended containment steps.
+            Public-facing SOC investigation documenting the analysis of a phishing email, including alert triage, severity classification, IOC review, threat intelligence enrichment, MITRE ATT&amp;CK mapping, investigation timeline, analyst notes, and containment recommendations.
           </p>
           <div class="actions">
             <a class="btn btn-primary" href="index.html#investigations">Back to SOC Portfolio</a>
@@ -473,15 +496,26 @@
 
         <section class="section-card" id="evidence">
           <span class="section-label">14 Evidence</span>
-          <h2>Evidence Placeholders</h2>
-          <p>Recommended screenshots to add later. These placeholders can be replaced with images once the evidence files are ready.</p>
-          <div class="placeholder-grid">
-            <div class="placeholder">Email view screenshot</div>
-            <div class="placeholder">VirusTotal result screenshot</div>
-            <div class="placeholder">Suspicious URL analysis screenshot</div>
-            <div class="placeholder">Alert dashboard screenshot</div>
+          <h2>Investigation Evidence</h2>
+          <p>Selected screenshots from the phishing investigation workflow. These visuals support the written analysis and help show the investigation process.</p>
+          <div class="evidence-grid">
+            <div class="evidence-card">
+              <img src="images-phishing-email.png" alt="Phishing email evidence">
+              <p>Suspicious phishing email delivered to the user inbox.</p>
+            </div>
+
+            <div class="evidence-card">
+              <img src="images-virustotal-result.png" alt="VirusTotal analysis result">
+              <p>Threat intelligence enrichment and URL analysis results.</p>
+            </div>
+
+            <div class="evidence-card">
+              <img src="images-alert-summary.png" alt="SOC alert summary">
+              <p>SOC alert summary and investigation workflow evidence.</p>
+            </div>
           </div>
         </section>
+
 
         <div class="actions">
           <a class="btn btn-primary" href="index.html#investigations">Back to Investigations</a>
