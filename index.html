@@ -742,6 +742,106 @@
         font-size: clamp(4rem, 18vw, 7rem);
       }
     }
+  
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 26px;
+    }
+
+    .platform-card {
+      position: relative;
+      overflow: hidden;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(34, 211, 238, 0.10), transparent 18rem),
+        linear-gradient(180deg, var(--panel), rgba(3, 7, 18, 0.72));
+      box-shadow: 0 16px 46px rgba(0, 0, 0, 0.24);
+      transition: 0.22s ease;
+    }
+
+    .platform-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(34, 211, 238, 0.38);
+    }
+
+    .platform-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .platform-header h3 {
+      font-size: 1.2rem;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+    }
+
+    .platform-badge {
+      flex: 0 0 auto;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(34, 211, 238, 0.24);
+      background: rgba(34, 211, 238, 0.10);
+      color: var(--cyan);
+      font-size: 0.76rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .platform-card p,
+    .platform-list li {
+      color: var(--muted);
+    }
+
+    .platform-list {
+      margin: 16px 0 0;
+      padding-left: 18px;
+    }
+
+    .platform-list li {
+      margin-bottom: 8px;
+    }
+
+    .achievement-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 20px;
+    }
+
+    .achievement-pill {
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(124, 58, 237, 0.26);
+      background: rgba(124, 58, 237, 0.14);
+      color: #c4b5fd;
+      font-size: 0.82rem;
+      font-weight: 850;
+    }
+
+    .project-list-mini {
+      margin: 14px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .project-list-mini li {
+      margin-bottom: 7px;
+    }
+
+    @media (max-width: 1160px) {
+      .platform-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -755,6 +855,7 @@
         <a href="#investigations">Investigations</a>
         <a href="#labs">Labs</a>
         <a href="#training">Training</a>
+        <a href="#platform-experience">Platforms</a>
         <a href="#skills">Skills</a>
         <a href="#experience">Experience</a>
         <a href="#contact">Contact</a>
@@ -1069,6 +1170,82 @@
         </div>
       </div>
     </section>
+
+    
+    <section class="section" id="platform-experience">
+      <div class="shell">
+        <div class="section-head">
+          <div class="section-number">// PLATFORM EXPERIENCE</div>
+          <div>
+            <h2 class="section-title">SOC training platforms and badge-backed learning.</h2>
+            <p class="section-intro">
+              Hands-on SOC analyst training completed between 2024–2025, covering phishing analysis,
+              SIEM investigation concepts, MITRE ATT&CK mapping, alert triage, and web attack analysis.
+            </p>
+          </div>
+        </div>
+
+        <div class="platform-grid">
+          <article class="platform-card">
+            <div class="platform-header">
+              <h3>LetsDefend</h3>
+              <span class="platform-badge">2024–2025</span>
+            </div>
+            <p>
+              Hands-on SOC investigation platform used for phishing investigations, SIEM alert triage,
+              MITRE ATT&CK mapping, incident response workflow exposure, and web attack analysis.
+            </p>
+            <ul class="platform-list">
+              <li>Phishing investigations and email threat analysis</li>
+              <li>SIEM exposure and alert review workflow</li>
+              <li>MITRE ATT&CK technique mapping</li>
+              <li>Web attack investigation practice</li>
+            </ul>
+            <div class="achievement-grid">
+              <span class="achievement-pill">Phishing Expert</span>
+              <span class="achievement-pill">SIEM 101</span>
+              <span class="achievement-pill">MITRE ATT&CK</span>
+              <span class="achievement-pill">Web Attack Investigator</span>
+            </div>
+          </article>
+
+          <article class="platform-card">
+            <div class="platform-header">
+              <h3>Packet Tracer</h3>
+              <span class="platform-badge">Networking</span>
+            </div>
+            <p>
+              Networking and security labs involving wireless routers, LAN segmentation, DHCP configuration,
+              static addressing, DNS, default gateways, and connectivity troubleshooting.
+            </p>
+            <ul class="platform-list">
+              <li>Wireless router and client configuration</li>
+              <li>Multi-LAN and wireless configuration</li>
+              <li>DHCP, DNS, gateway, and static IP practice</li>
+              <li>Connectivity testing and troubleshooting</li>
+            </ul>
+          </article>
+
+          <article class="platform-card">
+            <div class="platform-header">
+              <h3>Security Investigation Workflow</h3>
+              <span class="platform-badge">SOC Skills</span>
+            </div>
+            <p>
+              Practical exposure to investigation workflows including IOC review, phishing analysis,
+              URL reputation checks, log review, analyst notes, and incident documentation.
+            </p>
+            <ul class="platform-list">
+              <li>IOC analysis and enrichment</li>
+              <li>Alert triage and case documentation</li>
+              <li>Threat analysis and severity classification</li>
+              <li>Containment and detection recommendations</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
 
     <section class="section" id="contact">
       <div class="shell">
