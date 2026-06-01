@@ -1,63 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Windows Security Log Investigation | Richard Vincent</title>
 <style>
-:root{--bg:#fff;--text:#111;--muted:#555;--border:#ddd;--link:#0b57d0;--soft:#f7f7f7;--warn:#fff8e6;--warnb:#ead39a;--good:#f4fbf6;--goodb:#b9dcc2;--code:#f3f4f6}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.65}.container{max-width:980px;margin:0 auto;padding:24px 20px 48px}
-.topnav{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px;font-size:.95rem}.topnav a,.site-title a,.back-link,a{color:var(--link)}.topnav a{text-decoration:none}.topnav a:hover,.back-link:hover,.btn:hover{text-decoration:underline}.site-title{margin:0 0 8px;font-size:1rem;font-weight:700}
-.hero{margin-bottom:28px}.kicker{font-size:.9rem;color:var(--muted);margin:0 0 8px}h1{margin:0 0 12px;font-size:2.1rem;line-height:1.2}.lead{margin:0 0 18px;color:var(--muted);max-width:800px}.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0 0}.meta div{border:1px solid var(--border);background:var(--soft);padding:12px 14px;border-radius:8px}.meta strong{display:block;margin-bottom:4px}
-section{margin-bottom:26px}h2{font-size:1.25rem;margin:0 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}p{margin:0 0 12px}ul{margin:0;padding-left:22px}li{margin-bottom:8px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid var(--border);padding:10px;text-align:left;vertical-align:top}th{background:var(--soft)}
-.callout{border:1px solid var(--border);border-left:4px solid #888;background:var(--soft);padding:14px 16px;border-radius:8px}.verdict{background:var(--warn);border-color:var(--warnb);border-left-color:#b7791f}.recommendation{background:var(--good);border-color:var(--goodb);border-left-color:#2d7d46}code{background:var(--code);padding:1px 5px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:.94em}
-.figure{margin:16px 0;border:1px solid var(--border);background:var(--soft);padding:12px;border-radius:8px}.figure img{max-width:100%;height:auto;display:block;border:1px solid var(--border);border-radius:6px;background:#fff}.figure figcaption{color:var(--muted);font-size:.92rem;margin-top:8px}
-.buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.btn{display:inline-block;border:1px solid var(--border);background:var(--soft);color:var(--text);text-decoration:none;padding:10px 14px;border-radius:8px;font-size:.95rem}.footer-note{margin-top:32px;color:var(--muted);font-size:.92rem;border-top:1px solid var(--border);padding-top:18px}@media(max-width:700px){.meta{grid-template-columns:1fr}h1{font-size:1.7rem}}
+:root{--bg:#030712;--panel:rgba(9,17,31,.9);--text:#eef8ff;--muted:#96a9c2;--faint:#62748d;--line:rgba(148,163,184,.18);--line-strong:rgba(34,211,238,.32);--cyan:#22d3ee;--purple:#7c3aed;--green:#22c55e;--amber:#f59e0b;--red:#fb7185;--shadow:0 28px 90px rgba(0,0,0,.5);--max:1180px}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{min-height:100vh;color:var(--text);background:radial-gradient(circle at 0% 0%,rgba(34,211,238,.20),transparent 32rem),radial-gradient(circle at 88% 8%,rgba(124,58,237,.18),transparent 34rem),linear-gradient(135deg,#020617 0%,#050914 48%,#020617 100%);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;line-height:1.65}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(34,211,238,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black 0%,transparent 78%);z-index:-2}
+a{color:inherit;text-decoration:none}code{display:inline-block;padding:2px 6px;border:1px solid rgba(34,211,238,.16);border-radius:6px;color:#dbeafe;background:rgba(15,23,42,.72);font-family:Consolas,Monaco,monospace;font-size:.92em}.shell{width:min(94%,var(--max));margin:0 auto}
+.topbar{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line);background:rgba(3,7,18,.78);backdrop-filter:blur(18px)}.topbar-inner{min-height:72px;display:flex;justify-content:space-between;align-items:center;gap:24px}.brand{display:flex;align-items:center;gap:12px;font-weight:950;letter-spacing:-.03em}.brand-orb{width:38px;height:38px;display:grid;place-items:center;border-radius:999px;color:#020617;background:radial-gradient(circle at 35% 30%,#fff,var(--cyan) 38%,var(--purple));box-shadow:0 0 34px rgba(34,211,238,.3)}.nav-links{display:flex;flex-wrap:wrap;gap:14px;justify-content:flex-end;color:var(--muted);font-size:.9rem;font-weight:800}.nav-links a:hover{color:var(--cyan)}
+.hero{padding:70px 0 44px}.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:stretch}.hero-card,.summary-panel,.section-card{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),rgba(3,7,18,.7));box-shadow:0 16px 46px rgba(0,0,0,.24)}.hero-card{padding:34px;border-radius:34px;border-color:var(--line-strong);background:radial-gradient(circle at top right,rgba(34,211,238,.14),transparent 24rem),linear-gradient(180deg,rgba(9,17,31,.94),rgba(3,7,18,.82));box-shadow:var(--shadow)}
+.eyebrow,.section-label{width:fit-content;display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;padding:8px 12px;border:1px solid rgba(34,211,238,.26);border-radius:999px;color:var(--cyan);background:rgba(34,211,238,.08);font-size:.76rem;font-weight:950;letter-spacing:.12em;text-transform:uppercase}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 18px var(--green)}
+h1{max-width:860px;margin-bottom:18px;font-size:clamp(2.75rem,6vw,5.7rem);line-height:.9;letter-spacing:-.085em}.gradient{background:linear-gradient(135deg,#fff,var(--cyan) 42%,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}.lead{max-width:850px;color:var(--muted);font-size:1.08rem}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:12px 16px;border-radius:15px;border:1px solid transparent;font-weight:950;transition:.2s ease}.btn-primary{color:#020617;background:linear-gradient(135deg,var(--cyan),#60a5fa);box-shadow:0 16px 42px rgba(34,211,238,.22)}.btn-secondary{color:var(--text);background:rgba(255,255,255,.05);border-color:rgba(148,163,184,.22)}.btn:hover{transform:translateY(-2px);border-color:rgba(34,211,238,.52);box-shadow:0 18px 44px rgba(34,211,238,.12)}
+.summary-panel{padding:26px;border-radius:30px}.summary-panel h2{margin-bottom:16px;font-size:1.35rem;letter-spacing:-.03em}.summary-list{display:grid;gap:12px;list-style:none}.summary-list li{display:grid;gap:4px;padding:13px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.04)}.summary-list strong{color:var(--text);font-size:.88rem;text-transform:uppercase;letter-spacing:.08em}.summary-list span{color:var(--muted)}.severity-medium{color:#ffd28a!important;font-weight:900}
+.layout{display:grid;grid-template-columns:280px 1fr;gap:28px;align-items:start;padding:32px 0 80px}.toc{position:sticky;top:96px;padding:22px;border:1px solid var(--line);border-radius:24px;background:rgba(9,17,31,.82)}.toc h2{margin-bottom:14px;font-size:1rem}.toc a{display:block;padding:9px 0;color:var(--muted);border-bottom:1px solid rgba(148,163,184,.1);font-size:.92rem}.toc a:hover{color:var(--cyan)}.content{display:grid;gap:20px}.section-card{padding:26px;border-radius:26px}.section-card h2{margin-bottom:12px;font-size:1.35rem;line-height:1.2;letter-spacing:-.04em}.section-card p,.section-card li{color:var(--muted)}.section-card ul{padding-left:20px;margin-top:10px}.section-card li{margin-bottom:8px}
+.timeline{display:grid;gap:10px;margin-top:14px}.timeline-row{display:grid;grid-template-columns:90px 1fr;gap:14px;padding:13px 14px;border:1px solid rgba(148,163,184,.16);border-radius:16px;background:rgba(255,255,255,.04)}.timeline-row strong{color:var(--cyan);font-family:Consolas,Monaco,monospace}.timeline-row span{color:var(--muted)}.ioc-grid,.evidence-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}.ioc{display:inline-flex;padding:9px 11px;border:1px solid rgba(34,211,238,.18);border-radius:999px;color:#dbeafe;background:rgba(255,255,255,.05);font-size:.92rem}.callout{margin-top:12px;padding:18px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.045)}.verdict{border-color:rgba(251,113,133,.34);background:rgba(251,113,133,.08)}.recommendation{border-color:rgba(34,197,94,.30);background:rgba(34,197,94,.08)}.notes{border-color:rgba(34,211,238,.28);background:rgba(34,211,238,.07)}.evidence-card{overflow:hidden;border-radius:22px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}.evidence-card img{width:100%;display:block}.evidence-card p{padding:16px;color:#cbd5e1;font-size:.94rem}.footer-note{padding:20px 0 34px;border-top:1px solid var(--line);color:var(--faint);text-align:center;font-size:.92rem}
+@media(max-width:980px){.hero-grid,.layout{grid-template-columns:1fr}.toc{position:static}}@media(max-width:700px){.topbar-inner{flex-direction:column;align-items:flex-start;padding:16px 0}.nav-links{justify-content:flex-start}.hero-card,.summary-panel,.section-card{padding:22px;border-radius:24px}.timeline-row{grid-template-columns:1fr;gap:4px}}
 </style>
 </head>
-<body><div class="container">
-<div class="site-title"><a href="/">Richard Vincent</a></div>
-<nav class="topnav" aria-label="Primary">
-  <a href="/#about">About</a>
-  <a href="/#certifications">Certifications</a>
-  <a href="/#network-labs">Network Labs</a>
-  <a href="/#security-labs">Security Labs</a>
-  <a href="/#investigations">Investigations</a>
-  <a href="/#skills">Skills</a>
-  <a href="/#contact">Contact</a>
-</nav>
-<a class="back-link" href="/#investigations">&larr; Back to Investigations</a>
+<body>
+<header class="topbar">
+  <div class="shell topbar-inner">
+    <a href="index.html" class="brand"><span class="brand-orb">RV</span><span>Richard Vincent</span></a>
+    <nav class="nav-links">
+      <a href="index.html#investigations">Investigations</a>
+      <a href="index.html#labs">Labs</a>
+      <a href="index.html#training">Training</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
 
-<header class="hero">
-<p class="kicker">SOC Investigation &amp; Windows Security Log Analysis</p>
-<h1>Windows Security Log Investigation: Suspicious Authentication Activity</h1>
-<p class="lead">This case study documents a Windows Security log investigation focused on failed logons, successful logons, privileged authentication events, and suspicious account activity using Event Viewer.</p>
-<div class="meta">
-<div><strong>Investigation Type</strong>Windows Authentication / Security Log Investigation</div>
-<div><strong>Tool Used</strong>Windows Event Viewer</div>
-<div><strong>Log Source</strong>Windows Security Logs</div>
-<div><strong>Severity</strong>Medium</div>
-<div><strong>Final Classification</strong>Suspicious Authentication Activity</div>
-<div><strong>Status</strong>Evidence screenshots pending</div>
-</div></header>
 <main>
-<section><h2>Scenario / Alert Summary</h2><p>Multiple authentication-related Windows Security events were reviewed to identify suspicious login behavior. The investigation focused on whether repeated failed logon attempts, successful logons after failures, or privileged account activity suggested brute-force attempts, compromised credentials, or unauthorized access.</p></section>
-<section><h2>Objective</h2><p>The objective was to determine whether observed authentication events represented normal user activity or suspicious behavior requiring escalation, containment, or additional monitoring.</p></section>
-<section><h2>Tools Used</h2><ul><li>Windows Event Viewer</li><li>Windows Security Logs</li><li>Authentication and account activity Event IDs</li><li>Filtered log review and event correlation</li></ul></section>
-<section><h2>Key Event IDs Reviewed</h2><table><thead><tr><th>Event ID</th><th>Description</th><th>SOC Relevance</th></tr></thead><tbody>
-<tr><td>4624</td><td>Successful logon</td><td>Confirms authentication and can identify logon type, account, and source system.</td></tr>
-<tr><td>4625</td><td>Failed logon</td><td>Useful for detecting brute-force attempts, password spraying, and invalid credential use.</td></tr>
-<tr><td>4634</td><td>Logoff</td><td>Helps build session timelines and validate account activity.</td></tr>
-<tr><td>4672</td><td>Special privileges assigned to new logon</td><td>Identifies privileged sessions that may require administrative review.</td></tr>
-<tr><td>4720</td><td>User account created</td><td>Relevant when investigating unauthorized account creation or persistence activity.</td></tr>
-</tbody></table></section>
-<section><h2>Investigation Timeline</h2><table><thead><tr><th>Time</th><th>Activity</th></tr></thead><tbody><tr><td>09:10</td><td>Security logs reviewed in Event Viewer</td></tr><tr><td>09:14</td><td>Failed logon events identified</td></tr><tr><td>09:20</td><td>Source account and host context reviewed</td></tr><tr><td>09:26</td><td>Authentication Event IDs correlated</td></tr><tr><td>09:35</td><td>Findings and recommendations documented</td></tr></tbody></table></section>
-<section><h2>Findings</h2><ul><li>Repeated failed logon attempts were observed in the Windows Security log.</li><li>Successful authentication occurred after multiple failed attempts.</li><li>Privileged logon events were reviewed for legitimacy.</li><li>Account activity required validation against expected user behavior.</li><li>Event timing suggested possible suspicious authentication behavior.</li></ul></section>
-<section><h2>Analyst Notes</h2><div class="callout"><p>Repeated failed logons may indicate password guessing, brute-force activity, credential stuffing, or user error. A successful logon following repeated failures increases the importance of validating the account owner, source system, logon type, and time of access.</p></div></section>
-<section><h2>MITRE ATT&amp;CK Mapping</h2><table><thead><tr><th>Technique</th><th>Relevance</th></tr></thead><tbody><tr><td><strong>T1110 - Brute Force</strong></td><td>Repeated failed authentication attempts may indicate password guessing or brute-force behavior.</td></tr><tr><td><strong>T1078 - Valid Accounts</strong></td><td>A successful logon after suspicious failures may indicate misuse of valid credentials.</td></tr></tbody></table></section>
-<section><h2>Final Verdict</h2><div class="callout verdict"><p><strong>Suspicious Authentication Activity Identified</strong></p><p>The log review showed authentication patterns that may indicate unauthorized login attempts or misuse of valid credentials. The evidence did not confirm full compromise by itself, but the behavior warranted additional review and monitoring.</p></div></section>
-<section><h2>Recommendations</h2><div class="callout recommendation"><ul><li>Review affected user account activity for legitimacy.</li><li>Enable MFA where possible.</li><li>Monitor repeated failed logon attempts.</li><li>Review or enforce account lockout policy.</li><li>Validate privileged account usage.</li><li>Preserve and export relevant logs for follow-up investigation.</li></ul></div></section>
-<section><h2>Evidence Screenshots to Add</h2><ul><li>Filtered Windows Security log showing Event ID 4625</li><li>Event ID 4624 details showing successful logon context</li><li>Event ID 4672 details showing privileged logon context</li><li>Filtered Event Viewer results showing correlated authentication activity</li></ul></section>
+<section class="hero">
+  <div class="shell hero-grid">
+    <div class="hero-card">
+      <div class="eyebrow"><span class="dot"></span> SOC Investigation</div>
+      <h1>Windows Security <span class="gradient">Log Investigation</span></h1>
+      <p class="lead">
+        Public-facing SOC case study documenting a Windows Security log investigation focused on failed logons,
+        successful authentication, privileged logon events, account activity, MITRE ATT&amp;CK mapping, analyst notes,
+        and security recommendations using Event Viewer.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="index.html#investigations">Back to SOC Portfolio</a>
+        <a class="btn btn-secondary" href="https://github.com/RichVince/RichVince.github.io" target="_blank" rel="noopener">View GitHub Repository</a>
+      </div>
+    </div>
+
+    <aside class="summary-panel">
+      <h2>Investigation Snapshot</h2>
+      <ul class="summary-list">
+        <li><strong>Investigation Type</strong><span>Windows Authentication / Security Log Investigation</span></li>
+        <li><strong>Tool Used</strong><span>Windows Event Viewer</span></li>
+        <li><strong>Log Source</strong><span>Windows Security Logs</span></li>
+        <li><strong>Severity</strong><span class="severity-medium">Medium</span></li>
+        <li><strong>Final Classification</strong><span>Suspicious Authentication Activity</span></li>
+        <li><strong>Status</strong><span>Evidence screenshots pending</span></li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<section class="shell layout">
+  <aside class="toc">
+    <h2>Case Sections</h2>
+    <a href="#overview">Scenario</a>
+    <a href="#objective">Objective</a>
+    <a href="#tools">Tools Used</a>
+    <a href="#eventids">Event IDs</a>
+    <a href="#timeline">Timeline</a>
+    <a href="#findings">Findings</a>
+    <a href="#analyst-notes">Analyst Notes</a>
+    <a href="#mitre">MITRE Mapping</a>
+    <a href="#verdict">Verdict</a>
+    <a href="#recommendations">Recommendations</a>
+    <a href="#evidence">Evidence</a>
+  </aside>
+
+  <div class="content">
+    <section class="section-card" id="overview">
+      <span class="section-label">01 Scenario</span>
+      <h2>Scenario / Alert Summary</h2>
+      <p>Multiple authentication-related Windows Security events were reviewed to identify suspicious login behavior. The investigation focused on whether repeated failed logon attempts, successful logons after failures, or privileged account activity suggested brute-force attempts, compromised credentials, or unauthorized access.</p>
+    </section>
+
+    <section class="section-card" id="objective">
+      <span class="section-label">02 Objective</span>
+      <h2>Objective</h2>
+      <p>The objective was to determine whether observed authentication events represented normal user activity or suspicious behavior requiring escalation, containment, or additional monitoring.</p>
+    </section>
+
+    <section class="section-card" id="tools">
+      <span class="section-label">03 Tools</span>
+      <h2>Tools Used</h2>
+      <ul>
+        <li>Windows Event Viewer</li>
+        <li>Windows Security Logs</li>
+        <li>Authentication and account activity Event IDs</li>
+        <li>Filtered log review and event correlation</li>
+      </ul>
+    </section>
+
+    <section class="section-card" id="eventids">
+      <span class="section-label">04 Event IDs</span>
+      <h2>Key Event IDs Reviewed</h2>
+      <div class="ioc-grid">
+        <span class="ioc">4624 — Successful logon</span>
+        <span class="ioc">4625 — Failed logon</span>
+        <span class="ioc">4634 — Logoff</span>
+        <span class="ioc">4672 — Special privileges assigned</span>
+        <span class="ioc">4720 — User account created</span>
+      </div>
+    </section>
+
+    <section class="section-card" id="timeline">
+      <span class="section-label">05 Timeline</span>
+      <h2>Investigation Timeline</h2>
+      <div class="timeline">
+        <div class="timeline-row"><strong>09:10</strong><span>Security logs reviewed in Event Viewer.</span></div>
+        <div class="timeline-row"><strong>09:14</strong><span>Failed logon events identified.</span></div>
+        <div class="timeline-row"><strong>09:20</strong><span>Source account and host context reviewed.</span></div>
+        <div class="timeline-row"><strong>09:26</strong><span>Authentication Event IDs correlated.</span></div>
+        <div class="timeline-row"><strong>09:35</strong><span>Findings and recommendations documented.</span></div>
+      </div>
+    </section>
+
+    <section class="section-card" id="findings">
+      <span class="section-label">06 Findings</span>
+      <h2>Findings</h2>
+      <ul>
+        <li>Repeated failed logon attempts were observed in the Windows Security log.</li>
+        <li>Successful authentication occurred after multiple failed attempts.</li>
+        <li>Privileged logon events were reviewed for legitimacy.</li>
+        <li>Account activity required validation against expected user behavior.</li>
+        <li>Event timing suggested possible suspicious authentication behavior.</li>
+      </ul>
+    </section>
+
+    <section class="section-card" id="analyst-notes">
+      <span class="section-label">07 Analyst Notes</span>
+      <h2>Analyst Notes</h2>
+      <div class="callout notes">
+        <p>Repeated failed logons may indicate password guessing, brute-force activity, credential stuffing, or user error. A successful logon following repeated failures increases the importance of validating the account owner, source system, logon type, and time of access.</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="mitre">
+      <span class="section-label">08 MITRE Mapping</span>
+      <h2>MITRE ATT&amp;CK Mapping</h2>
+      <ul>
+        <li><strong>T1110 - Brute Force:</strong> repeated failed authentication attempts may indicate password guessing or brute-force behavior.</li>
+        <li><strong>T1078 - Valid Accounts:</strong> successful logon after suspicious failures may indicate misuse of valid credentials.</li>
+      </ul>
+    </section>
+
+    <section class="section-card" id="verdict">
+      <span class="section-label">09 Verdict</span>
+      <h2>Final Verdict</h2>
+      <div class="callout verdict">
+        <p><strong>Suspicious Authentication Activity Identified</strong></p>
+        <p>The log review showed authentication patterns that may indicate unauthorized login attempts or misuse of valid credentials. The evidence did not confirm full compromise by itself, but the behavior warranted additional review and monitoring.</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="recommendations">
+      <span class="section-label">10 Recommendations</span>
+      <h2>Recommendations</h2>
+      <div class="callout recommendation">
+        <ul>
+          <li>Review affected user account activity for legitimacy.</li>
+          <li>Enable MFA where possible.</li>
+          <li>Monitor repeated failed logon attempts.</li>
+          <li>Review or enforce account lockout policy.</li>
+          <li>Validate privileged account usage.</li>
+          <li>Preserve and export relevant logs for follow-up investigation.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="evidence">
+      <span class="section-label">11 Evidence</span>
+      <h2>Evidence Screenshots to Add</h2>
+      <p>Add screenshots when available. The page is ready for these evidence files.</p>
+      <div class="ioc-grid">
+        <span class="ioc">Filtered Windows Security log showing Event ID 4625</span>
+        <span class="ioc">Event ID 4624 successful logon details</span>
+        <span class="ioc">Event ID 4672 privileged logon details</span>
+        <span class="ioc">Filtered Event Viewer authentication results</span>
+      </div>
+    </section>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="index.html#investigations">Back to Investigations</a>
+      <a class="btn btn-secondary" href="index.html#contact">Contact Richard</a>
+    </div>
+  </div>
+</section>
 </main>
-<div class="buttons"><a class="btn" href="/#investigations">Back to Investigations</a><a class="btn" href="https://github.com/RichVince/RichVince.github.io">View GitHub Repository</a></div>
-<p class="footer-note">This project is structured as a SOC case study. Add authentication screenshots before making it a featured investigation.</p>
-</div></body></html>
+
+<footer class="footer-note"><div class="shell">Richard Vincent | SOC Investigation Project</div></footer>
+</body>
+</html>
