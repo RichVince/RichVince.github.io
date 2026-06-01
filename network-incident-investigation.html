@@ -1,46 +1,716 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Network Incident Investigation and Remediation | Richard Vincent</title><style>
-    :root{--bg:#030712;--panel:rgba(9,17,31,.9);--text:#eef8ff;--muted:#96a9c2;--faint:#62748d;--line:rgba(148,163,184,.18);--line-strong:rgba(34,211,238,.32);--cyan:#22d3ee;--purple:#7c3aed;--green:#22c55e;--amber:#f59e0b;--red:#fb7185;--shadow:0 28px 90px rgba(0,0,0,.5);--max:1180px}
-    *{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
-    body{min-height:100vh;color:var(--text);background:radial-gradient(circle at 0% 0%,rgba(34,211,238,.20),transparent 32rem),radial-gradient(circle at 88% 8%,rgba(124,58,237,.18),transparent 34rem),linear-gradient(135deg,#020617 0%,#050914 48%,#020617 100%);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;line-height:1.65}
-    body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(34,211,238,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black 0%,transparent 78%);z-index:-2}
-    a{color:inherit;text-decoration:none}code{display:inline-block;padding:2px 6px;border:1px solid rgba(34,211,238,.16);border-radius:6px;color:#dbeafe;background:rgba(15,23,42,.72);font-family:Consolas,Monaco,monospace;font-size:.92em}.shell{width:min(94%,var(--max));margin:0 auto}
-    .topbar{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line);background:rgba(3,7,18,.78);backdrop-filter:blur(18px)}.topbar-inner{min-height:72px;display:flex;justify-content:space-between;align-items:center;gap:24px}.brand{display:flex;align-items:center;gap:12px;font-weight:950;letter-spacing:-.03em}.brand-orb{width:38px;height:38px;display:grid;place-items:center;border-radius:999px;color:#020617;background:radial-gradient(circle at 35% 30%,#fff,var(--cyan) 38%,var(--purple));box-shadow:0 0 34px rgba(34,211,238,.3)}.nav-links{display:flex;flex-wrap:wrap;gap:14px;justify-content:flex-end;color:var(--muted);font-size:.9rem;font-weight:800}.nav-links a:hover{color:var(--cyan)}
-    .hero{padding:70px 0 44px}.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:stretch}.hero-card,.summary-panel,.section-card{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),rgba(3,7,18,.7));box-shadow:0 16px 46px rgba(0,0,0,.24)}.hero-card{padding:34px;border-radius:34px;border-color:var(--line-strong);background:radial-gradient(circle at top right,rgba(34,211,238,.14),transparent 24rem),linear-gradient(180deg,rgba(9,17,31,.94),rgba(3,7,18,.82));box-shadow:var(--shadow)}
-    .eyebrow,.section-label{width:fit-content;display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;padding:8px 12px;border:1px solid rgba(34,211,238,.26);border-radius:999px;color:var(--cyan);background:rgba(34,211,238,.08);font-size:.76rem;font-weight:950;letter-spacing:.12em;text-transform:uppercase}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 18px var(--green)}
-    h1{max-width:860px;margin-bottom:18px;font-size:clamp(2.75rem,6vw,5.7rem);line-height:.9;letter-spacing:-.085em}.gradient{background:linear-gradient(135deg,#fff,var(--cyan) 42%,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}.lead{max-width:850px;color:var(--muted);font-size:1.08rem}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:12px 16px;border-radius:15px;border:1px solid transparent;font-weight:950;transition:.2s ease}.btn-primary{color:#020617;background:linear-gradient(135deg,var(--cyan),#60a5fa);box-shadow:0 16px 42px rgba(34,211,238,.22)}.btn-secondary{color:var(--text);background:rgba(255,255,255,.05);border-color:rgba(148,163,184,.22)}.btn:hover{transform:translateY(-2px);border-color:rgba(34,211,238,.52);box-shadow:0 18px 44px rgba(34,211,238,.12)}
-    .summary-panel{padding:26px;border-radius:30px}.summary-panel h2{margin-bottom:16px;font-size:1.35rem;letter-spacing:-.03em}.summary-list{display:grid;gap:12px;list-style:none}.summary-list li{display:grid;gap:4px;padding:13px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.04)}.summary-list strong{color:var(--text);font-size:.88rem;text-transform:uppercase;letter-spacing:.08em}.summary-list span{color:var(--muted)}.severity-medium{color:#ffd28a!important;font-weight:900}.severity-high{color:#ff9aaa!important;font-weight:900}
-    .layout{display:grid;grid-template-columns:280px 1fr;gap:28px;align-items:start;padding:32px 0 80px}.toc{position:sticky;top:96px;padding:22px;border:1px solid var(--line);border-radius:24px;background:rgba(9,17,31,.82)}.toc h2{margin-bottom:14px;font-size:1rem}.toc a{display:block;padding:9px 0;color:var(--muted);border-bottom:1px solid rgba(148,163,184,.1);font-size:.92rem}.toc a:hover{color:var(--cyan)}.content{display:grid;gap:20px}.section-card{padding:26px;border-radius:26px}.section-card h2{margin-bottom:12px;font-size:1.35rem;line-height:1.2;letter-spacing:-.04em}.section-card p,.section-card li{color:var(--muted)}.section-card ul{padding-left:20px;margin-top:10px}.section-card li{margin-bottom:8px}
-    .timeline{display:grid;gap:10px;margin-top:14px}.timeline-row{display:grid;grid-template-columns:90px 1fr;gap:14px;padding:13px 14px;border:1px solid rgba(148,163,184,.16);border-radius:16px;background:rgba(255,255,255,.04)}.timeline-row strong{color:var(--cyan);font-family:Consolas,Monaco,monospace}.timeline-row span{color:var(--muted)}.ioc-grid,.evidence-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}.ioc{display:inline-flex;padding:9px 11px;border:1px solid rgba(34,211,238,.18);border-radius:999px;color:#dbeafe;background:rgba(255,255,255,.05);font-size:.92rem}.callout{margin-top:12px;padding:18px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.045)}.verdict{border-color:rgba(251,113,133,.34);background:rgba(251,113,133,.08)}.recommendation{border-color:rgba(34,197,94,.30);background:rgba(34,197,94,.08)}.notes{border-color:rgba(34,211,238,.28);background:rgba(34,211,238,.07)}.evidence-card{overflow:hidden;border-radius:22px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}.evidence-card img{width:100%;display:block}.evidence-card p{padding:16px;color:#cbd5e1;font-size:.94rem}.footer-note{padding:20px 0 34px;border-top:1px solid var(--line);color:var(--faint);text-align:center;font-size:.92rem}
-    @media(max-width:980px){.hero-grid,.layout{grid-template-columns:1fr}.toc{position:static}}@media(max-width:700px){.topbar-inner{flex-direction:column;align-items:flex-start;padding:16px 0}.nav-links{justify-content:flex-start}.hero-card,.summary-panel,.section-card{padding:22px;border-radius:24px}.timeline-row{grid-template-columns:1fr;gap:4px}}
-</style></head><body>
-<header class="topbar"><div class="shell topbar-inner"><a href="index.html" class="brand"><span class="brand-orb">RV</span><span>Richard Vincent</span></a><nav class="nav-links"><a href="index.html#investigations">Investigations</a><a href="index.html#labs">Labs</a><a href="index.html#training">Training</a><a href="index.html#contact">Contact</a></nav></div></header>
-<main><section class="hero"><div class="shell hero-grid"><div class="hero-card"><div class="eyebrow"><span class="dot"></span> SOC Investigation</div><h1>Network Incident <span class="gradient">Investigation</span></h1><p class="lead">Public-facing SOC case study documenting suspicious outbound traffic, host-based triage, malicious process correlation, rogue account discovery, plaintext PII exfiltration, containment, validation, and recommendations.</p><div class="actions"><a class="btn btn-primary" href="index.html#investigations">Back to SOC Portfolio</a><a class="btn btn-secondary" href="https://github.com/RichVince/RichVince.github.io" target="_blank" rel="noopener">View GitHub Repository</a></div></div><aside class="summary-panel"><h2>Investigation Snapshot</h2><ul class="summary-list"><li><strong>Investigation Type</strong><span>Network Security / Endpoint Investigation</span></li>
-<li><strong>Severity</strong><span class="severity-high">High</span></li>
-<li><strong>Status</strong><span>Contained and Verified</span></li>
-<li><strong>Environment</strong><span>Simulated Enterprise Lab</span></li>
-<li><strong>Tools Used</strong><span>Wireshark, Event Viewer, PowerShell, Windows CLI</span></li>
-<li><strong>Final Classification</strong><span>Confirmed Host Compromise and Data Exfiltration</span></li></ul></aside></div></section>
-<section class="shell layout"><aside class="toc"><h2>Case Sections</h2><a href="#overview">Project Overview</a>
-<a href="#objective">Objective</a>
-<a href="#timeline">Timeline</a>
-<a href="#indicators">Indicators</a>
-<a href="#analysis">Analysis</a>
-<a href="#analyst-notes">Analyst Notes</a>
-<a href="#mitre">MITRE Mapping</a>
-<a href="#verdict">Verdict</a>
-<a href="#recommendations">Recommendations</a>
-<a href="#lessons">Lessons Learned</a>
-<a href="#evidence">Evidence</a></aside><div class="content"><section class="section-card" id="overview"><span class="section-label">01 Overview</span><h2>Project Overview</h2><p>This simulated SOC investigation documents suspicious outbound network traffic, host-based triage, account and process correlation, plaintext PII exfiltration, containment actions, and post-remediation validation.</p></section>
-<section class="section-card" id="objective"><span class="section-label">02 Objective</span><h2>Objective</h2><p>The objective was to determine the source of suspicious outbound traffic, identify the associated process, validate unauthorized account activity, determine whether sensitive data was exposed, and confirm successful containment.</p></section>
-<section class="section-card" id="timeline"><span class="section-label">03 Timeline</span><h2>Investigation Timeline</h2><div class="timeline"><div class="timeline-row"><strong>09:00</strong><span>Packet capture reviewed in Wireshark.</span></div><div class="timeline-row"><strong>09:05</strong><span>Suspicious outbound TCP traffic discovered.</span></div><div class="timeline-row"><strong>09:12</strong><span>Destination IP and port identified.</span></div><div class="timeline-row"><strong>09:20</strong><span>Endpoint process correlation performed using host tools.</span></div><div class="timeline-row"><strong>09:35</strong><span>Unauthorized account identified and Event ID 4720 reviewed.</span></div><div class="timeline-row"><strong>09:50</strong><span>TCP stream followed and plaintext PII exposure confirmed.</span></div><div class="timeline-row"><strong>10:10</strong><span>Containment completed and traffic stopped.</span></div></div></section>
-<section class="section-card" id="indicators"><span class="section-label">04 Indicators</span><h2>Indicators of Compromise</h2><div class="ioc-grid"><span class="ioc">External IP: 75.30.5.55</span><span class="ioc">Compromised Host: 10.10.1.5</span><span class="ioc">Sensor: 10.10.1.55</span><span class="ioc">Port: 1337/TCP</span><span class="ioc">Rogue Account: Adm1nistrator</span><span class="ioc">Process: WinT0Ols.exe</span><span class="ioc">Path: C:\Users\admin\downloads\dist</span><span class="ioc">Event ID: 4720</span></div></section>
-<section class="section-card" id="analysis"><span class="section-label">05 Analysis</span><h2>Analysis</h2><p>Packet analysis identified suspicious outbound TCP traffic from internal host <code>10.10.1.5</code> to external IP <code>75.30.5.55</code> over port <code>1337/TCP</code>. Endpoint triage correlated the connection to a suspicious process named <code>WinT0Ols.exe</code> running from <code>C:\Users\admin\downloads\dist</code>.</p><p>Additional host review identified a rogue local account named <code>Adm1nistrator</code>. Event Viewer validation using Windows Event ID <code>4720</code> confirmed account creation activity. TCP stream analysis showed plaintext transmission of customer identity data, including names, addresses, and social security numbers.</p></section>
-<section class="section-card" id="analyst-notes"><span class="section-label">06 Analyst Notes</span><h2>Analyst Notes</h2><div class="callout notes"><p>The combination of unauthorized outbound communication, suspicious process execution, rogue account creation, and plaintext data transfer indicates a compromised endpoint requiring containment and further forensic review.</p></div></section>
-<section class="section-card" id="mitre"><span class="section-label">07 MITRE Mapping</span><h2>MITRE ATT&amp;CK Mapping</h2><ul><li><strong>T1041</strong> - Exfiltration Over C2 Channel</li><li><strong>T1136</strong> - Create Account</li><li><strong>T1071</strong> - Application Layer Protocol</li><li><strong>T1059</strong> - Command and Scripting Interpreter</li></ul></section>
-<section class="section-card" id="verdict"><span class="section-label">08 Verdict</span><h2>Final Verdict</h2><div class="callout verdict"><p><strong>Confirmed Host Compromise and Data Exfiltration</strong></p><p>The investigation confirmed malicious outbound communication, suspicious process execution, unauthorized account creation, and plaintext exfiltration of personally identifiable information.</p></div></section>
-<section class="section-card" id="recommendations"><span class="section-label">09 Recommendations</span><h2>Recommendations</h2><div class="callout recommendation"><ul><li>Implement tighter monitoring for suspicious outbound connections and unusual destination ports.</li><li>Alert on unauthorized local account creation events such as Event ID 4720.</li><li>Review endpoint process execution paths for suspicious binaries running from user-controlled directories.</li><li>Apply egress filtering and endpoint controls to reduce the risk of plaintext data exfiltration.</li><li>Restrict execution from user download folders and monitor abnormal process names.</li></ul></div></section>
-<section class="section-card" id="lessons"><span class="section-label">10 Lessons Learned</span><h2>Lessons Learned</h2><ul><li>Packet analysis helps detect hidden compromise and data movement.</li><li>Network and endpoint evidence create stronger investigations when correlated.</li><li>Account creation events are critical indicators during compromise review.</li><li>Data exfiltration can occur over plaintext channels when egress controls are weak.</li></ul></section>
-<section class="section-card" id="evidence"><span class="section-label">Evidence</span><h2>Investigation Evidence</h2><p>Selected screenshots from the investigation workflow. These visuals support the written analysis and help show the investigation process.</p><div class="evidence-grid"><div class="evidence-card"><img src="network-incident-wireshark.png" alt="Wireshark suspicious outbound traffic evidence"><p>Recommended evidence: suspicious outbound TCP traffic to 75.30.5.55 over port 1337.</p></div>
-<div class="evidence-card"><img src="network-incident-eventviewer.png" alt="Event Viewer Event ID 4720 evidence"><p>Recommended evidence: Windows Event ID 4720 showing unauthorized account creation.</p></div>
-<div class="evidence-card"><img src="network-incident-process.png" alt="Malicious process evidence"><p>Recommended evidence: host process review showing WinT0Ols.exe execution path.</p></div></div></section>
-<div class="actions"><a class="btn btn-primary" href="index.html#investigations">Back to Investigations</a><a class="btn btn-secondary" href="index.html#contact">Contact Richard</a></div></div></section></main><footer class="footer-note"><div class="shell">Richard Vincent | SOC Investigation Project</div></footer></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Network Incident Investigation and Remediation | Richard Vincent</title>
+  <style>
+    :root {
+      --bg: #030712;
+      --panel: rgba(9, 17, 31, 0.9);
+      --text: #eef8ff;
+      --muted: #96a9c2;
+      --faint: #62748d;
+      --line: rgba(148, 163, 184, 0.18);
+      --line-strong: rgba(34, 211, 238, 0.32);
+      --cyan: #22d3ee;
+      --purple: #7c3aed;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #fb7185;
+      --shadow: 0 28px 90px rgba(0, 0, 0, 0.5);
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.2), transparent 32rem),
+        radial-gradient(circle at 88% 8%, rgba(124, 58, 237, 0.18), transparent 34rem),
+        linear-gradient(135deg, #020617 0%, #050914 48%, #020617 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.65;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(34, 211, 238, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black 0%, transparent 78%);
+      z-index: -2;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    code {
+      display: inline-block;
+      padding: 2px 6px;
+      border: 1px solid rgba(34, 211, 238, 0.16);
+      border-radius: 6px;
+      color: #dbeafe;
+      background: rgba(15, 23, 42, 0.72);
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.92em;
+    }
+
+    .shell {
+      width: min(94%, var(--max));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid var(--line);
+      background: rgba(3, 7, 18, 0.78);
+      backdrop-filter: blur(18px);
+    }
+
+    .topbar-inner {
+      min-height: 72px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 950;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-orb {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: #020617;
+      background: radial-gradient(circle at 35% 30%, #fff, var(--cyan) 38%, var(--purple));
+      box-shadow: 0 0 34px rgba(34, 211, 238, 0.3);
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: flex-end;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .nav-links a:hover {
+      color: var(--cyan);
+    }
+
+    .hero {
+      padding: 70px 0 44px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-card,
+    .summary-panel,
+    .section-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--panel), rgba(3, 7, 18, 0.7));
+      box-shadow: 0 16px 46px rgba(0, 0, 0, 0.24);
+    }
+
+    .hero-card {
+      padding: 34px;
+      border-radius: 34px;
+      border-color: var(--line-strong);
+      background:
+        radial-gradient(circle at top right, rgba(34, 211, 238, 0.14), transparent 24rem),
+        linear-gradient(180deg, rgba(9, 17, 31, 0.94), rgba(3, 7, 18, 0.82));
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow,
+    .section-label {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding: 8px 12px;
+      border: 1px solid rgba(34, 211, 238, 0.26);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(34, 211, 238, 0.08);
+      font-size: 0.76rem;
+      font-weight: 950;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+    }
+
+    h1 {
+      max-width: 860px;
+      margin-bottom: 18px;
+      font-size: clamp(2.75rem, 6vw, 5.7rem);
+      line-height: 0.9;
+      letter-spacing: -0.085em;
+    }
+
+    .gradient {
+      background: linear-gradient(135deg, #fff, var(--cyan) 42%, #a78bfa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .lead {
+      max-width: 850px;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 12px 16px;
+      border-radius: 15px;
+      border: 1px solid transparent;
+      font-weight: 950;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      color: #020617;
+      background: linear-gradient(135deg, var(--cyan), #60a5fa);
+      box-shadow: 0 16px 42px rgba(34, 211, 238, 0.22);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(148, 163, 184, 0.22);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(34, 211, 238, 0.52);
+      box-shadow: 0 18px 44px rgba(34, 211, 238, 0.12);
+    }
+
+    .summary-panel {
+      padding: 26px;
+      border-radius: 30px;
+    }
+
+    .summary-panel h2 {
+      margin-bottom: 16px;
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 12px;
+      list-style: none;
+    }
+
+    .summary-list li {
+      display: grid;
+      gap: 4px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .summary-list strong {
+      color: var(--text);
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .summary-list span {
+      color: var(--muted);
+    }
+
+    .severity-medium {
+      color: #ffd28a !important;
+      font-weight: 900;
+    }
+
+    .severity-high {
+      color: #ff9aaa !important;
+      font-weight: 900;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 28px;
+      align-items: start;
+      padding: 32px 0 80px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 96px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(9, 17, 31, 0.82);
+    }
+
+    .toc h2 {
+      margin-bottom: 14px;
+      font-size: 1rem;
+    }
+
+    .toc a {
+      display: block;
+      padding: 9px 0;
+      color: var(--muted);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      font-size: 0.92rem;
+    }
+
+    .toc a:hover {
+      color: var(--cyan);
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section-card {
+      padding: 26px;
+      border-radius: 26px;
+    }
+
+    .section-card h2 {
+      margin-bottom: 12px;
+      font-size: 1.35rem;
+      line-height: 1.2;
+      letter-spacing: -0.04em;
+    }
+
+    .section-card p,
+    .section-card li {
+      color: var(--muted);
+    }
+
+    .section-card ul {
+      padding-left: 20px;
+      margin-top: 10px;
+    }
+
+    .section-card li {
+      margin-bottom: 8px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 14px;
+      padding: 13px 14px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .timeline-row strong {
+      color: var(--cyan);
+      font-family: Consolas, Monaco, monospace;
+    }
+
+    .timeline-row span {
+      color: var(--muted);
+    }
+
+    .ioc-grid,
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .ioc {
+      display: inline-flex;
+      padding: 9px 11px;
+      border: 1px solid rgba(34, 211, 238, 0.18);
+      border-radius: 999px;
+      color: #dbeafe;
+      background: rgba(255, 255, 255, 0.05);
+      font-size: 0.92rem;
+    }
+
+    .callout {
+      margin-top: 12px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .verdict {
+      border-color: rgba(251, 113, 133, 0.34);
+      background: rgba(251, 113, 133, 0.08);
+    }
+
+    .recommendation {
+      border-color: rgba(34, 197, 94, 0.3);
+      background: rgba(34, 197, 94, 0.08);
+    }
+
+    .notes {
+      border-color: rgba(34, 211, 238, 0.28);
+      background: rgba(34, 211, 238, 0.07);
+    }
+
+    .evidence-card {
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .evidence-card img {
+      width: 100%;
+      height: 220px;
+      display: block;
+      object-fit: cover;
+      background: #081120;
+    }
+
+    .evidence-card p {
+      padding: 16px;
+      color: #cbd5e1;
+      font-size: 0.94rem;
+    }
+
+    .footer-note {
+      padding: 20px 0 34px;
+      border-top: 1px solid var(--line);
+      color: var(--faint);
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px 0;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .hero-card,
+      .summary-panel,
+      .section-card {
+        padding: 22px;
+        border-radius: 24px;
+      }
+
+      .timeline-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-orb">RV</span>
+        <span>Richard Vincent</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html#investigations">Investigations</a>
+        <a href="index.html#labs">Labs</a>
+        <a href="index.html#training">Training</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div class="hero-card">
+          <div class="eyebrow">
+            <span class="dot"></span> SOC Investigation
+          </div>
+          <h1>Network Incident <span class="gradient">Investigation</span></h1>
+          <p class="lead">
+            Public-facing SOC case study documenting suspicious outbound traffic, host-based triage, malicious process correlation, rogue account discovery, plaintext PII exfiltration, containment, validation, and recommendations.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" href="index.html#investigations">Back to SOC Portfolio</a>
+            <a class="btn btn-secondary" href="https://github.com/RichVince/RichVince.github.io" target="_blank" rel="noopener">View GitHub Repository</a>
+          </div>
+        </div>
+
+        <aside class="summary-panel">
+          <h2>Investigation Snapshot</h2>
+          <ul class="summary-list">
+            <li><strong>Investigation Type</strong><span>Network Security / Endpoint Investigation</span></li>
+            <li><strong>Severity</strong><span class="severity-high">High</span></li>
+            <li><strong>Status</strong><span>Contained and Verified</span></li>
+            <li><strong>Environment</strong><span>Simulated Enterprise Lab</span></li>
+            <li><strong>Tools Used</strong><span>Wireshark, Event Viewer, PowerShell, Windows CLI</span></li>
+            <li><strong>Final Classification</strong><span>Confirmed Host Compromise and Data Exfiltration</span></li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="shell layout">
+      <aside class="toc">
+        <h2>Case Sections</h2>
+        <a href="#overview">Project Overview</a>
+        <a href="#objective">Objective</a>
+        <a href="#timeline">Timeline</a>
+        <a href="#indicators">Indicators</a>
+        <a href="#analysis">Analysis</a>
+        <a href="#analyst-notes">Analyst Notes</a>
+        <a href="#mitre">MITRE Mapping</a>
+        <a href="#verdict">Verdict</a>
+        <a href="#recommendations">Recommendations</a>
+        <a href="#lessons">Lessons Learned</a>
+        <a href="#evidence">Evidence</a>
+      </aside>
+
+      <div class="content">
+        <section class="section-card" id="overview">
+          <span class="section-label">01 Overview</span>
+          <h2>Project Overview</h2>
+          <p>This simulated SOC investigation documents suspicious outbound network traffic, host-based triage, account and process correlation, plaintext PII exfiltration, containment actions, and post-remediation validation.</p>
+        </section>
+
+        <section class="section-card" id="objective">
+          <span class="section-label">02 Objective</span>
+          <h2>Objective</h2>
+          <p>The objective was to determine the source of suspicious outbound traffic, identify the associated process, validate unauthorized account activity, determine whether sensitive data was exposed, and confirm successful containment.</p>
+        </section>
+
+        <section class="section-card" id="timeline">
+          <span class="section-label">03 Timeline</span>
+          <h2>Investigation Timeline</h2>
+          <div class="timeline">
+            <div class="timeline-row"><strong>09:00</strong><span>Packet capture reviewed in Wireshark.</span></div>
+            <div class="timeline-row"><strong>09:05</strong><span>Suspicious outbound TCP traffic discovered.</span></div>
+            <div class="timeline-row"><strong>09:12</strong><span>Destination IP and port identified.</span></div>
+            <div class="timeline-row"><strong>09:20</strong><span>Endpoint process correlation performed using host tools.</span></div>
+            <div class="timeline-row"><strong>09:35</strong><span>Unauthorized account identified and Event ID 4720 reviewed.</span></div>
+            <div class="timeline-row"><strong>09:50</strong><span>TCP stream followed and plaintext PII exposure confirmed.</span></div>
+            <div class="timeline-row"><strong>10:10</strong><span>Containment completed and traffic stopped.</span></div>
+          </div>
+        </section>
+
+        <section class="section-card" id="indicators">
+          <span class="section-label">04 Indicators</span>
+          <h2>Indicators of Compromise</h2>
+          <div class="ioc-grid">
+            <span class="ioc">External IP: 75.30.5.55</span>
+            <span class="ioc">Compromised Host: 10.10.1.5</span>
+            <span class="ioc">Sensor: 10.10.1.55</span>
+            <span class="ioc">Port: 1337/TCP</span>
+            <span class="ioc">Rogue Account: Adm1nistrator</span>
+            <span class="ioc">Process: WinT0Ols.exe</span>
+            <span class="ioc">Path: C:\Users\admin\downloads\dist</span>
+            <span class="ioc">Event ID: 4720</span>
+          </div>
+        </section>
+
+        <section class="section-card" id="analysis">
+          <span class="section-label">05 Analysis</span>
+          <h2>Analysis</h2>
+          <p>
+            Packet analysis identified suspicious outbound TCP traffic from internal host
+            <code>10.10.1.5</code> to external IP <code>75.30.5.55</code> over port <code>1337/TCP</code>.
+            Endpoint triage correlated the connection to a suspicious process named
+            <code>WinT0Ols.exe</code> running from <code>C:\Users\admin\downloads\dist</code>.
+          </p>
+          <p>
+            Additional host review identified a rogue local account named <code>Adm1nistrator</code>.
+            Event Viewer validation using Windows Event ID <code>4720</code> confirmed account
+            creation activity. TCP stream analysis showed plaintext transmission of customer
+            identity data, including names, addresses, and social security numbers.
+          </p>
+        </section>
+
+        <section class="section-card" id="analyst-notes">
+          <span class="section-label">06 Analyst Notes</span>
+          <h2>Analyst Notes</h2>
+          <div class="callout notes">
+            <p>
+              The combination of unauthorized outbound communication, suspicious process execution,
+              rogue account creation, and plaintext data transfer indicates a compromised endpoint
+              requiring containment and further forensic review.
+            </p>
+          </div>
+        </section>
+
+        <section class="section-card" id="mitre">
+          <span class="section-label">07 MITRE Mapping</span>
+          <h2>MITRE ATT&amp;CK Mapping</h2>
+          <ul>
+            <li><strong>T1041</strong> - Exfiltration Over C2 Channel</li>
+            <li><strong>T1136</strong> - Create Account</li>
+            <li><strong>T1071</strong> - Application Layer Protocol</li>
+            <li><strong>T1059</strong> - Command and Scripting Interpreter</li>
+          </ul>
+        </section>
+
+        <section class="section-card" id="verdict">
+          <span class="section-label">08 Verdict</span>
+          <h2>Final Verdict</h2>
+          <div class="callout verdict">
+            <p><strong>Confirmed Host Compromise and Data Exfiltration</strong></p>
+            <p>
+              The investigation confirmed malicious outbound communication, suspicious process
+              execution, unauthorized account creation, and plaintext exfiltration of personally
+              identifiable information.
+            </p>
+          </div>
+        </section>
+
+        <section class="section-card" id="recommendations">
+          <span class="section-label">09 Recommendations</span>
+          <h2>Recommendations</h2>
+          <div class="callout recommendation">
+            <ul>
+              <li>Implement tighter monitoring for suspicious outbound connections and unusual destination ports.</li>
+              <li>Alert on unauthorized local account creation events such as Event ID 4720.</li>
+              <li>Review endpoint process execution paths for suspicious binaries running from user-controlled directories.</li>
+              <li>Apply egress filtering and endpoint controls to reduce the risk of plaintext data exfiltration.</li>
+              <li>Restrict execution from user download folders and monitor abnormal process names.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section-card" id="lessons">
+          <span class="section-label">10 Lessons Learned</span>
+          <h2>Lessons Learned</h2>
+          <ul>
+            <li>Packet analysis helps detect hidden compromise and data movement.</li>
+            <li>Network and endpoint evidence create stronger investigations when correlated.</li>
+            <li>Account creation events are critical indicators during compromise review.</li>
+            <li>Data exfiltration can occur over plaintext channels when egress controls are weak.</li>
+          </ul>
+        </section>
+
+        <section class="section-card" id="evidence">
+          <span class="section-label">Evidence</span>
+          <h2>Investigation Evidence</h2>
+          <p>
+            Selected screenshots from the investigation workflow. These visuals support the written
+            analysis and help show the investigation process.
+          </p>
+
+          <div class="evidence-grid">
+            <div class="evidence-card">
+              <img
+                src="wireshark-suspicious-outbound-traffic-evidence.png"
+                alt="Wireshark suspicious outbound traffic evidence"
+              />
+              <p>Recommended evidence: suspicious outbound TCP traffic to 75.30.5.55 over port 1337.</p>
+            </div>
+
+            <div class="evidence-card">
+              <img
+                src="Event-Viewer-Event-ID-4720-evidence.png"
+                alt="Event Viewer Event ID 4720 evidence"
+              />
+              <p>Recommended evidence: Windows Event ID 4720 showing unauthorized account creation.</p>
+            </div>
+
+            <div class="evidence-card">
+              <img
+                src="Malicious-process-evidence.png"
+                alt="Malicious process evidence"
+              />
+              <p>Recommended evidence: host process review showing WinT0Ols.exe execution path.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="index.html#investigations">Back to Investigations</a>
+          <a class="btn btn-secondary" href="index.html#contact">Contact Richard</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer-note">
+    <div class="shell">Richard Vincent | SOC Investigation Project</div>
+  </footer>
+</body>
+</html>
