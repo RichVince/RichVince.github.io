@@ -855,7 +855,7 @@
         <a href="#investigations">Investigations</a>
         <a href="#labs">Labs</a>
         <a href="#training">Training</a>
-        <a href="#platform-experience">SOC Platforms</a>
+        <a href="#platform-experience">Platforms</a>
         <a href="#skills">Skills</a>
         <a href="#experience">Experience</a>
         <a href="#contact">Contact</a>
@@ -934,6 +934,7 @@
       </div>
     </section>
 
+    
     <section class="section" id="investigations" aria-labelledby="investigations-title">
       <div class="shell">
         <div class="section-head">
@@ -941,109 +942,95 @@
           <div>
             <h2 class="section-title" id="investigations-title">Featured SOC Investigations</h2>
             <p class="section-intro">
-              Practical security investigations demonstrating alert triage, phishing analysis,
-              authentication log review, IOC analysis, web attack detection, MITRE ATT&CK mapping,
-              and incident response recommendations.
+              Practical security investigations demonstrating incident response, endpoint triage, phishing analysis,
+              authentication log review, IOC analysis, DNS investigation, web attack detection, MITRE ATT&amp;CK mapping,
+              and remediation recommendations.
             </p>
           </div>
         </div>
 
         <div class="project-board">
-	<article class="featured-project">
- 		 <span class="tag">Incident Response</span>
-
-  	<h3>Network Incident Investigation & Data Exfiltration Analysis</h3>
-
- 	 <p>
-   	 Investigated suspicious outbound communication, malicious process execution,
-   	 unauthorized account creation, and potential data exfiltration using
-    		network and endpoint evidence.
-  </p>
-
-  <p class="skill-line">
-    <strong>Skills:</strong>
-    Wireshark analysis, endpoint investigation, Windows Event Logs,
-    IOC analysis, MITRE ATT&CK mapping, incident response
-  </p>
-
-  <div class="quick-actions">
-    <a class="btn btn-primary"
-       href="network-incident-investigation.html"
-       target="_blank"
-       rel="noopener">
-       View Investigation
-    </a>
-  </div>
-</article>
-	<article class="featured-project">
-  <span class="tag">Incident Response</span>
-
-  <h3>Network Incident Investigation & Data Exfiltration Analysis</h3>
-
-  <p>
-    Investigated suspicious outbound communication, malicious process execution,
-    unauthorized account creation, and potential data exfiltration using
-    network and endpoint evidence.
-  </p>
-
-  <p class="skill-line">
-    <strong>Skills:</strong>
-    Wireshark analysis, endpoint investigation, Windows Event Logs,
-    IOC analysis, MITRE ATT&CK mapping, incident response
-  </p>
-
-  <div class="quick-actions">
-    <a class="btn btn-primary"
-       href="network-incident-investigation.html"
-       target="_blank"
-       rel="noopener">
-       View Investigation
-    </a>
-  </div>
-</article>
           <article class="featured-project">
-            <span class="tag">Featured Investigation</span>
-            <h3>Enterprise Phishing Email Investigation</h3>
+            <span class="tag">Incident Response</span>
+            <h3>Network Incident Investigation &amp; Data Exfiltration Analysis</h3>
             <p>
-              SOC-style phishing investigation documenting alert triage, email header review, IOC analysis, VirusTotal validation, user risk assessment, MITRE ATT&CK mapping, and containment recommendations.
+              Investigated suspicious outbound communication, malicious process execution,
+              unauthorized account creation, and potential data exfiltration using network and endpoint evidence.
             </p>
-            <p class="skill-line"><strong>Skills:</strong> Phishing analysis, SOC triage, IOC analysis, VirusTotal, MITRE ATT&CK, incident response</p>
+            <p class="skill-line">
+              <strong>Skills:</strong> Wireshark analysis, endpoint investigation, Windows Event Logs,
+              IOC analysis, MITRE ATT&amp;CK mapping, incident response
+            </p>
             <div class="quick-actions">
-              <a class="btn btn-primary" href="phishing-investigation.html" target="_blank" rel="noopener">View Investigation</a>
+              <a class="btn btn-primary" href="network-incident-investigation.html" target="_blank" rel="noopener">View Investigation</a>
             </div>
           </article>
 
           <div class="project-list">
             <article class="project-card">
+              <span class="tag">Windows Logs</span>
+              <div>
+                <h3>Windows Security Log Investigation</h3>
+                <p>
+                  Reviewed Windows security logs to identify suspicious authentication activity, correlate Event IDs,
+                  and document analyst findings.
+                </p>
+              </div>
+              <a href="windows-security-log-investigation.html" target="_blank" rel="noopener">View →</a>
+            </article>
+
+            <article class="project-card">
+              <span class="tag">Phishing</span>
+              <div>
+                <h3>Enterprise Phishing Email Investigation</h3>
+                <p>
+                  Investigated a phishing alert involving email header review, IOC analysis, threat intelligence enrichment,
+                  MITRE mapping, user risk, and containment recommendations.
+                </p>
+              </div>
+              <a href="phishing-investigation.html" target="_blank" rel="noopener">View →</a>
+            </article>
+
+            <article class="project-card">
               <span class="tag">Auth Logs</span>
               <div>
                 <h3>Detecting Brute-Force and Suspicious Login Activity</h3>
-                <p>Analyzed authentication-related web logs to identify repeated login attempts, suspicious credential patterns, and brute-force-style activity from a single source IP.</p>
+                <p>
+                  Analyzed authentication-related web logs to identify repeated login attempts, suspicious credential patterns,
+                  and brute-force-style activity from a single source IP.
+                </p>
               </div>
               <a href="brute-force-login-investigation.html" target="_blank" rel="noopener">View →</a>
+            </article>
+
+            <article class="project-card">
+              <span class="tag">DNS Logs</span>
+              <div>
+                <h3>Suspicious DNS Activity Investigation</h3>
+                <p>
+                  Reviewed Windows DNS Client Operational logs to identify suspicious domain resolution activity and document
+                  follow-up SOC recommendations.
+                </p>
+              </div>
+              <a href="dns-client-log-investigation.html" target="_blank" rel="noopener">View →</a>
             </article>
 
             <article class="project-card">
               <span class="tag">Web Attack</span>
               <div>
                 <h3>Web Log Analysis: Open Redirection Attempts</h3>
-                <p>Reviewed web server logs to detect encoded external URL injection, attacker obfuscation patterns, and open redirection probing against a web application.</p>
+                <p>
+                  Reviewed web server logs to detect encoded external URL injection, attacker obfuscation patterns,
+                  and open redirection probing against a web application.
+                </p>
               </div>
               <a href="open-redirection-investigation.html" target="_blank" rel="noopener">View →</a>
-            </article>
-
-            <article class="project-card">
-              <span class="tag">Detection Notes</span>
-              <div>
-                <h3>Additional Detection Notes and Analysis</h3>
-                <p>Space for additional write-ups covering detection techniques, supporting lab analysis, and security investigations as the portfolio expands.</p>
-              </div>
-              <a href="#contact">Discuss →</a>
             </article>
           </div>
         </div>
       </div>
     </section>
+
 
     <section class="section" id="labs">
       <div class="shell">
