@@ -147,6 +147,14 @@
       color: var(--cyan);
     }
 
+    .nav-links .grc-link {
+      color: #c4b5fd;
+    }
+
+    .nav-links .grc-link:hover {
+      color: #ddd6fe;
+    }
+
     .hero {
       min-height: calc(100vh - 72px);
       display: grid;
@@ -276,10 +284,21 @@
       border-color: rgba(148, 163, 184, 0.22);
     }
 
+    .btn-grc {
+      color: #e9ddff;
+      background: rgba(124, 58, 237, 0.12);
+      border-color: rgba(124, 58, 237, 0.28);
+    }
+
     .btn:hover {
       transform: translateY(-2px);
       border-color: rgba(34, 211, 238, 0.52);
       box-shadow: 0 18px 44px rgba(34, 211, 238, 0.12);
+    }
+
+    .btn-grc:hover {
+      border-color: rgba(196, 181, 253, 0.55);
+      box-shadow: 0 18px 44px rgba(124, 58, 237, 0.16);
     }
 
     .identity-stats {
@@ -742,7 +761,7 @@
         font-size: clamp(4rem, 18vw, 7rem);
       }
     }
-  
+
     .platform-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -841,7 +860,6 @@
         grid-template-columns: 1fr;
       }
     }
-
   </style>
 </head>
 <body>
@@ -859,6 +877,7 @@
         <a href="#skills">Skills</a>
         <a href="#experience">Experience</a>
         <a href="#contact">Contact</a>
+        <a href="grc-portfolio.html" class="grc-link" target="_blank" rel="noopener">GRC Portfolio</a>
       </nav>
     </div>
   </header>
@@ -885,6 +904,7 @@
               <a class="btn btn-secondary" href="https://www.credly.com/users/richard-vincent.29374cc2" target="_blank" rel="noopener">View Credly Badges</a>
               <a class="btn btn-secondary" href="https://www.linkedin.com/in/richvince" target="_blank" rel="noopener">LinkedIn</a>
               <a class="btn btn-secondary" href="https://github.com/RichVince" target="_blank" rel="noopener">GitHub</a>
+              <a class="btn btn-grc" href="grc-portfolio.html" target="_blank" rel="noopener">View GRC Portfolio</a>
             </div>
           </div>
 
@@ -927,14 +947,13 @@
             </div>
             <div class="signal-card">
               <h3>Recruiter Access</h3>
-              <p>Resume, Credly, LinkedIn, GitHub, and hands-on project writeups are available from this page.</p>
+              <p>Resume, Credly, LinkedIn, GitHub, hands-on project writeups, and a separate GRC portfolio are available from this page.</p>
             </div>
           </div>
         </section>
       </div>
     </section>
 
-    
     <section class="section" id="investigations" aria-labelledby="investigations-title">
       <div class="shell">
         <div class="section-head">
@@ -1030,7 +1049,6 @@
         </div>
       </div>
     </section>
-
 
     <section class="section" id="labs">
       <div class="shell">
@@ -1212,7 +1230,6 @@
       </div>
     </section>
 
-    
     <section class="section" id="platform-experience">
       <div class="shell">
         <div class="section-head">
@@ -1287,7 +1304,6 @@
       </div>
     </section>
 
-
     <section class="section" id="contact">
       <div class="shell">
         <div class="contact-panel">
@@ -1295,11 +1311,12 @@
             <div class="section-number">// 06 CONTACT</div>
             <h2>Ready for SOC and junior cybersecurity opportunities.</h2>
             <p class="section-intro">
-              Recruiters and hiring teams can access my resume, certifications, LinkedIn, GitHub, and cybersecurity projects.
+              Recruiters and hiring teams can access my resume, certifications, LinkedIn, GitHub, cybersecurity projects, and a separate GRC portfolio.
             </p>
             <div class="quick-actions">
               <a class="btn btn-primary" href="Richard_Vincent_Resume_Public.pdf" target="_blank" rel="noopener">View Resume</a>
               <a class="btn btn-secondary" href="https://www.credly.com/users/richard-vincent.29374cc2" target="_blank" rel="noopener">Credly Badges</a>
+              <a class="btn btn-grc" href="grc-portfolio.html" target="_blank" rel="noopener">View GRC Portfolio</a>
             </div>
           </div>
 
@@ -1308,6 +1325,7 @@
             <div class="contact-row"><strong>Credly</strong><a href="https://www.credly.com/users/richard-vincent.29374cc2" target="_blank" rel="noopener">credly.com/users/richard-vincent.29374cc2</a></div>
             <div class="contact-row"><strong>LinkedIn</strong><a href="https://www.linkedin.com/in/richvince" target="_blank" rel="noopener">linkedin.com/in/richvince</a></div>
             <div class="contact-row"><strong>GitHub</strong><a href="https://github.com/RichVince" target="_blank" rel="noopener">github.com/RichVince</a></div>
+            <div class="contact-row"><strong>GRC Portfolio</strong><a href="grc-portfolio.html" target="_blank" rel="noopener">Open GRC Portfolio</a></div>
             <div class="contact-row"><strong>Location</strong><span>Atlanta Metropolitan Area</span></div>
             <div class="contact-row"><strong>Target Roles</strong><span>SOC Analyst • Junior Cybersecurity Analyst • Security Analyst</span></div>
           </div>
